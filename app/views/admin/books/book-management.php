@@ -1,6 +1,3 @@
-<?php
-require_once __DIR__ . '../../../../config/config.php';
-?>
 <!DOCTYPE html>
 <html lang="en">
 
@@ -10,13 +7,12 @@ require_once __DIR__ . '../../../../config/config.php';
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="<?= asset('css/admin_dashboard.css') ?>">
-    <link rel="stylesheet" href="<?= asset('css/admin.css') ?>">
-    <title><?= $title ?? 'Book Management' ?></title>
+    <title>Book Management</title>
 </head>
 
 <body>
     <div class="d-flex" id="wrapper">
-        <?php require_once __DIR__ . '../../components/sidebar.php'; ?>
+        <?php require_once __DIR__ . '/../components/sidebar.php'; ?>
 
         <div id="page-content-wrapper">
             <nav class="navbar navbar-expand-lg navbar-light bg-light border-bottom">
@@ -24,58 +20,63 @@ require_once __DIR__ . '../../../../config/config.php';
                     <button class="btn btn-primary" id="sidebarToggle"><i class="fas fa-bars"></i></button>
                 </div>
             </nav>
+            
             <div class="container-fluid px-4">
                 <h2 class="mb-2 mt-4">Book Management</h2>
                 <p class="text-muted mb-4">View and manage books</p>
 
                 <div class="container mt-4">
                     <!-- Flash Messages -->
-                    <?php if ($message): ?>
-                        <div class="alert alert-<?= $message_type === 'error' ? 'danger' : 'success' ?>">
-                            <?= htmlspecialchars($message) ?>
+                    <?php if (isset($data['message']) && $data['message']): ?>
+                        <div class="alert alert-<?= $data['message_type'] === 'error' ? 'danger' : 'success' ?>">
+                            <?= htmlspecialchars($data['message']) ?>
                         </div>
                     <?php endif; ?>
 
                     <!-- Search and Add -->
                     <div class="row mb-3">
                         <div class="col-md-6">
-                            <form method="GET" action="admin.php" class="d-flex">
-                                <input type="hidden" name="action" value="books">
+                            <form method="GET" action="<?= url('admin.php') ?>" class="d-flex">
+                                <input type="hidden" name="action" value="book-management">
                                 <input type="text" name="keyword" class="form-control me-2" 
                                        placeholder="Search by title, author, publisher..." 
-                                       value="<?= htmlspecialchars($keyword ?? '') ?>">
+                                       value="<?= htmlspecialchars($data['keyword'] ?? '') ?>">
                                 <button type="submit" class="btn btn-outline-primary">Search</button>
-                                <?php if (!empty($keyword)): ?>
-                                    <a href="admin.php?action=books" class="btn btn-outline-secondary ms-2">Clear</a>
+                                <?php if (!empty($data['keyword'])): ?>
+                                    <a href="<?= url('admin.php?action=book-management') ?>" class="btn btn-outline-secondary ms-2">Clear</a>
                                 <?php endif; ?>
                             </form>
                         </div>
                         <div class="col-md-6 text-end">
-                            <a href="admin.php?action=add-book" class="btn btn-success">
+                            <!-- NÚT IMPORT EXCEL -->
+                            <a href="<?= url('admin.php?action=import-books') ?>" class="btn btn-info">
+                                <i class="fas fa-file-import"></i> Import Excel
+                            </a>
+                            <a href="<?= url('admin.php?action=add-book') ?>" class="btn btn-success">
                                 <i class="fas fa-plus"></i> Add New Book
                             </a>
                         </div>
                     </div>
 
                     <!-- Results Count -->
-                    <?php if (isset($totalBooks)): ?>
+                    <?php if (isset($data['totalBooks'])): ?>
                         <div class="mb-3">
                             <p class="text-muted">
-                                Found <?= $totalBooks ?> book<?= $totalBooks != 1 ? 's' : '' ?>
-                                <?php if (!empty($keyword)): ?>
-                                    for "<strong><?= htmlspecialchars($keyword) ?></strong>"
+                                Found <?= $data['totalBooks'] ?> book<?= $data['totalBooks'] != 1 ? 's' : '' ?>
+                                <?php if (!empty($data['keyword'])): ?>
+                                    for "<strong><?= htmlspecialchars($data['keyword']) ?></strong>"
                                 <?php endif; ?>
                             </p>
                         </div>
                     <?php endif; ?>
 
                     <!-- Books Table -->
-                    <?php if (empty($books)): ?>
+                    <?php if (empty($data['books'])): ?>
                         <div class="alert alert-info">
-                            <?php if (!empty($keyword)): ?>
-                                No books found for "<?= htmlspecialchars($keyword) ?>"
+                            <?php if (!empty($data['keyword'])): ?>
+                                No books found for "<?= htmlspecialchars($data['keyword']) ?>"
                             <?php else: ?>
-                                No books found. <a href="admin.php?action=add-book">Add your first book</a>
+                                No books found. <a href="<?= url('admin.php?action=add-book') ?>">Add your first book</a>
                             <?php endif; ?>
                         </div>
                     <?php else: ?>
@@ -92,11 +93,11 @@ require_once __DIR__ . '../../../../config/config.php';
                                 </tr>
                             </thead>
                             <tbody>
-                                <?php foreach ($books as $book): ?>
+                                <?php foreach ($data['books'] as $book): ?>
                                     <tr>
                                         <td>#<?= $book['book_id'] ?></td>
                                         <td>
-                                            <img src="<?= $book['url'] ? htmlspecialchars($book['url']) : '/library-management-system/public/images/no-image.png' ?>" 
+                                            <img src="<?= $book['url'] ? htmlspecialchars($book['url']) : url('public/images/no-image.png') ?>" 
                                                  width="50" height="70" style="object-fit: cover;" 
                                                  alt="<?= htmlspecialchars($book['title']) ?>">
                                         </td>
@@ -105,11 +106,11 @@ require_once __DIR__ . '../../../../config/config.php';
                                         <td><?= htmlspecialchars($book['publisher'] ?? 'N/A') ?></td>
                                         <td><?= htmlspecialchars($book['publish_year'] ?? 'N/A') ?></td>
                                         <td>
-                                            <a href="admin.php?action=edit-book&id=<?= $book['book_id'] ?>" 
+                                            <a href="<?= url('admin.php?action=edit-book&id=' . $book['book_id']) ?>" 
                                                class="btn btn-warning btn-sm" title="Edit">
                                                 <i class="fas fa-edit"></i>
                                             </a>
-                                            <form method="POST" action="admin.php?action=delete-book" 
+                                            <form method="POST" action="<?= url('admin.php?action=delete-book') ?>" 
                                                   class="d-inline" onsubmit="return confirm('Are you sure you want to delete this book?')">
                                                 <input type="hidden" name="book_id" value="<?= $book['book_id'] ?>">
                                                 <button type="submit" class="btn btn-danger btn-sm" title="Delete">
@@ -123,68 +124,66 @@ require_once __DIR__ . '../../../../config/config.php';
                         </table>
 
                         <!-- Pagination -->
-                        <?php if (isset($totalPages) && $totalPages > 1): ?>
+                        <?php if (isset($data['totalPages']) && $data['totalPages'] > 1): ?>
                         <nav aria-label="Page navigation" class="mt-4">
                             <ul class="pagination justify-content-center">
                                 <!-- Previous Button -->
-                                <li class="page-item <?= ($currentPage <= 1) ? 'disabled' : '' ?>">
+                                <li class="page-item <?= ($data['currentPage'] <= 1) ? 'disabled' : '' ?>">
                                     <a class="page-link" 
-                                       href="admin.php?action=books&page=<?= $currentPage - 1 ?><?= !empty($keyword) ? '&keyword=' . urlencode($keyword) : '' ?>">
+                                       href="<?= url('admin.php?action=book-management&page=' . ($data['currentPage'] - 1) . (!empty($data['keyword']) ? '&keyword=' . urlencode($data['keyword']) : '')) ?>">
                                         <i class="fas fa-chevron-left"></i> Previous
                                     </a>
                                 </li>
-                                
+
                                 <!-- Page Numbers -->
                                 <?php 
-                                $startPage = max(1, $currentPage - 2);
-                                $endPage = min($totalPages, $currentPage + 2);
-                                
-                                // Show first page
+                                $startPage = max(1, $data['currentPage'] - 2);
+                                $endPage = min($data['totalPages'], $data['currentPage'] + 2);
+
                                 if ($startPage > 1): ?>
                                     <li class="page-item">
-                                        <a class="page-link" href="admin.php?action=books&page=1<?= !empty($keyword) ? '&keyword=' . urlencode($keyword) : '' ?>">1</a>
+                                        <a class="page-link" href="<?= url('admin.php?action=book-management&page=1' . (!empty($data['keyword']) ? '&keyword=' . urlencode($data['keyword']) : '')) ?>">1</a>
                                     </li>
                                     <?php if ($startPage > 2): ?>
                                         <li class="page-item disabled"><span class="page-link">...</span></li>
                                     <?php endif; ?>
                                 <?php endif; ?>
-                                
+
                                 <?php for ($i = $startPage; $i <= $endPage; $i++): ?>
-                                    <li class="page-item <?= ($i == $currentPage) ? 'active' : '' ?>">
+                                    <li class="page-item <?= ($i == $data['currentPage']) ? 'active' : '' ?>">
                                         <a class="page-link" 
-                                           href="admin.php?action=books&page=<?= $i ?><?= !empty($keyword) ? '&keyword=' . urlencode($keyword) : '' ?>">
+                                           href="<?= url('admin.php?action=book-management&page=' . $i . (!empty($data['keyword']) ? '&keyword=' . urlencode($data['keyword']) : '')) ?>">
                                             <?= $i ?>
                                         </a>
                                     </li>
                                 <?php endfor; ?>
-                                
-                                <!-- Show last page -->
-                                <?php if ($endPage < $totalPages): ?>
-                                    <?php if ($endPage < $totalPages - 1): ?>
+
+                                <?php if ($endPage < $data['totalPages']): ?>
+                                    <?php if ($endPage < $data['totalPages'] - 1): ?>
                                         <li class="page-item disabled"><span class="page-link">...</span></li>
                                     <?php endif; ?>
                                     <li class="page-item">
                                         <a class="page-link" 
-                                           href="admin.php?action=books&page=<?= $totalPages ?><?= !empty($keyword) ? '&keyword=' . urlencode($keyword) : '' ?>">
-                                            <?= $totalPages ?>
+                                           href="<?= url('admin.php?action=book-management&page=' . $data['totalPages'] . (!empty($data['keyword']) ? '&keyword=' . urlencode($data['keyword']) : '')) ?>">
+                                            <?= $data['totalPages'] ?>
                                         </a>
                                     </li>
                                 <?php endif; ?>
-                                
+
                                 <!-- Next Button -->
-                                <li class="page-item <?= ($currentPage >= $totalPages) ? 'disabled' : '' ?>">
+                                <li class="page-item <?= ($data['currentPage'] >= $data['totalPages']) ? 'disabled' : '' ?>">
                                     <a class="page-link" 
-                                       href="admin.php?action=books&page=<?= $currentPage + 1 ?><?= !empty($keyword) ? '&keyword=' . urlencode($keyword) : '' ?>">
+                                       href="<?= url('admin.php?action=book-management&page=' . ($data['currentPage'] + 1) . (!empty($data['keyword']) ? '&keyword=' . urlencode($data['keyword']) : '')) ?>">
                                         Next <i class="fas fa-chevron-right"></i>
                                     </a>
                                 </li>
                             </ul>
-                            
+
                             <!-- Page Info -->
                             <div class="text-center mt-2">
                                 <small class="text-muted">
-                                    Page <?= $currentPage ?> of <?= $totalPages ?>
-                                    | Showing <?= count($books) ?> of <?= $totalBooks ?> books
+                                    Page <?= $data['currentPage'] ?> of <?= $data['totalPages'] ?>
+                                    | Showing <?= count($data['books']) ?> of <?= $data['totalBooks'] ?> books
                                 </small>
                             </div>
                         </nav>
@@ -194,6 +193,7 @@ require_once __DIR__ . '../../../../config/config.php';
             </div>
         </div>
     </div>
+    
     <script>
         window.addEventListener('DOMContentLoaded', event => {
             const sidebarToggle = document.body.querySelector('#sidebarToggle');
@@ -203,7 +203,7 @@ require_once __DIR__ . '../../../../config/config.php';
                     document.body.classList.toggle('sb-sidenav-toggled');
                 });
             }
-            
+
             // Auto-hide flash messages after 5 seconds
             setTimeout(function() {
                 const alerts = document.querySelectorAll('.alert');
