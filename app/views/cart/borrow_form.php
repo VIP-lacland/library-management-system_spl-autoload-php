@@ -63,6 +63,11 @@ document.addEventListener('DOMContentLoaded', function() {
     threeWeeksFromNow.setDate(today.getDate() + 21);
     const maxDateString = threeWeeksFromNow.toISOString().split('T')[0];
     returnDateInput.max = maxDateString;
+
+    const form = document.querySelector('form');
+    form.addEventListener('submit', function() {
+        alert('Request sent successfully! You will be redirected to the "My Loans" page.');
+    });
 });
 </script>
 

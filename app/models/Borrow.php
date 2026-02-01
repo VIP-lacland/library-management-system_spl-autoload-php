@@ -151,7 +151,7 @@ class Borrow {
                 FROM Book_Items bi
                 LEFT JOIN Loans l ON bi.book_items_id = l.book_items_id AND l.status = 'pending'
                 WHERE bi.book_id = :book_id 
-                AND bi.status NOT IN ('borrowed', 'lost', 'damaged', 'maintenance', 'Borrowed', 'Lost', 'Damaged')
+                AND bi.status = 'available'
                 AND l.loan_id IS NULL
                 LIMIT 1";
         $stmt = $this->db->prepare($sql);
