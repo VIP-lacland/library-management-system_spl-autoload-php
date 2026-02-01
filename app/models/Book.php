@@ -13,7 +13,9 @@ class Book
 
     public function getAllBooks()
     {
-        $sql = "SELECT book_id, title, author, publisher, publish_year, description, url FROM Books";
+        $sql = "SELECT b.book_id, b.title, b.author, b.publisher, b.publish_year, b.description, b.url,
+                (SELECT COUNT(*) FROM Book_Items bi WHERE bi.book_id = b.book_id AND bi.status NOT IN ('borrowed', 'lost', 'damaged', 'maintenance', 'Borrowed', 'Lost', 'Damaged')) as available_count
+                FROM Books b";
         $stmt = $this->db->prepare($sql);
         $stmt->execute();
         return $stmt->fetchAll();
@@ -69,6 +71,18 @@ class Book
     }
 
     // Lấy thông tin chi tiết sách
+    public function searchBooks($keyword)
+    {
+        $keyword = "%$keyword%";
+        $sql = "SELECT b.book_id, b.title, b.author, b.publisher, b.publish_year, b.description, b.url,
+                (SELECT COUNT(*) FROM Book_Items bi WHERE bi.book_id = b.book_id AND bi.status NOT IN ('borrowed', 'lost', 'damaged', 'maintenance', 'Borrowed', 'Lost', 'Damaged')) as available_count
+                FROM Books b 
+                WHERE b.title LIKE :keyword OR b.author LIKE :keyword OR b.publisher LIKE :keyword";
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute(['keyword' => $keyword]);
+        return $stmt->fetchAll();
+    }
+
     public function getBookDetail($bookId)
     {
         $bookId = (int)$bookId;
