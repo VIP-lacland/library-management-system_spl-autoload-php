@@ -14,67 +14,83 @@ require_once __DIR__ . '/../../config/config.php';
 <body>
     <main>
         <div class="container">
-            <div class="book-detail">
-        <?php if ($book): ?>
-            <div class="book-header">
-                <h1><?php echo htmlspecialchars($book['title']); ?></h1>
-                <p class="author">
-                    <strong>Author:</strong> <?php echo htmlspecialchars($book['author']); ?>
-                </p>
-            </div>
-
-            <div class="book-info">
-                <div class="info">
-                    <strong>Category:</strong>
-                    <span><?php echo htmlspecialchars($book['category_name'] ?? 'N/A'); ?></span>
+            <!-- Hiển thị thông báo lỗi/thành công -->
+            <?php if (isset($_SESSION['flash'])): ?>
+                <?php 
+                    $msg = $_SESSION['flash']['success'] ?? $_SESSION['flash']['error'] ?? '';
+                    $type = isset($_SESSION['flash']['success']) ? 'success' : 'danger';
+                    if($msg):
+                ?>
+                <div class="alert alert-<?= $type ?> mt-3">
+                    <?= $msg; unset($_SESSION['flash']); ?>
                 </div>
-
-                <div class="info">
-                    <strong>NXB:</strong>
-                    <span><?php echo htmlspecialchars($book['publisher'] ?? 'N/A'); ?></span>
-                </div>
-
-                <div class="info">
-                    <strong>Year of publication:</strong>
-                    <span><?php echo htmlspecialchars($book['publish_year'] ?? 'N/A'); ?></span>
-                </div>
-
-                <p class="description">
-                    <strong>Describe:</strong><br>
-                    <?php echo nl2br(htmlspecialchars($book['description'] ?? '')); ?>
-                </p>
-
-                <?php if (!empty($book['url'])): ?>
-                    <div class="info">
-                        <strong>Reference links:</strong>
-                        <span>
-                            <a href="<?php echo htmlspecialchars($book['url']); ?>" 
-                               target="_blank" rel="noopener noreferrer">
-                                <?php echo htmlspecialchars($book['url']); ?>
-                            </a>
-                        </span>
-                    </div>
                 <?php endif; ?>
-            </div>
-
-            <?php if (!empty($statuses)): ?>
-                <div class="status">
-                    <h3>Book condition</h3>
-                    <ul class="status-list">
-                        <?php foreach ($statuses as $item): ?>
-                            <li>
-                                <?php echo ucfirst(htmlspecialchars($item['status'])); ?>: 
-                                <strong><?php echo htmlspecialchars($item['total']); ?></strong> cuốn
-                            </li>
-                        <?php endforeach; ?>
-                    </ul>
-                </div>
             <?php endif; ?>
 
-            <div class="btn-group">
-                <a href="<?= BASE_URL ?>" class="btn btn-secondary">
-                    ← Back to the list
-                </a>
+            <div class="book-detail">
+        <?php if ($book): ?>
+            <div class="row">
+                <!-- Cột trái: Ảnh sách -->
+                <div class="col-md-4 text-center mb-4">
+                    <?php if (!empty($book['url'])): ?>
+                        <img src="<?= htmlspecialchars($book['url']) ?>" alt="<?= htmlspecialchars($book['title']) ?>" class="img-fluid rounded shadow" style="max-height: 500px; width: auto;">
+                    <?php else: ?>
+                        <div class="bg-secondary text-white d-flex align-items-center justify-content-center rounded shadow" style="height: 400px; width: 100%;">
+                            <span>No Image</span>
+                        </div>
+                    <?php endif; ?>
+                </div>
+
+                <!-- Cột phải: Thông tin chi tiết -->
+                <div class="col-md-8">
+                    <div class="book-header mb-3">
+                        <h1 class="fw-bold"><?php echo htmlspecialchars($book['title']); ?></h1>
+                        <p class="fs-5 text-muted">
+                            <strong>Author:</strong> <?php echo htmlspecialchars($book['author']); ?>
+                        </p>
+                    </div>
+
+                    <div class="book-info mb-4">
+                        <p><strong>Category:</strong> <?php echo htmlspecialchars($book['category_name'] ?? 'N/A'); ?></p>
+                        <p><strong>Publisher:</strong> <?php echo htmlspecialchars($book['publisher'] ?? 'N/A'); ?></p>
+                        <p><strong>Year of publication:</strong> <?php echo htmlspecialchars($book['publish_year'] ?? 'N/A'); ?></p>
+
+                        <div class="description mt-3">
+                            <strong>Description:</strong><br>
+                            <div class="text-justify">
+                                <?php echo nl2br(htmlspecialchars($book['description'] ?? '')); ?>
+                            </div>
+                        </div>
+                    </div>
+
+                    <?php if (!empty($statuses)): ?>
+                        <div class="status mb-4">
+                            <h5>Book condition</h5>
+                            <ul class="list-unstyled">
+                                <?php foreach ($statuses as $item): ?>
+                                    <li>
+                                        <span class="badge bg-info text-dark"><?php echo ucfirst(htmlspecialchars($item['status'])); ?></span>: 
+                                        <strong><?php echo htmlspecialchars($item['total']); ?></strong> cuốn
+                                    </li>
+                                <?php endforeach; ?>
+                            </ul>
+                        </div>
+                    <?php endif; ?>
+
+                    <div class="d-flex gap-2">
+                        <!-- Form thêm vào giỏ -->
+                        <form action="<?= url('index.php?action=cart-add') ?>" method="POST">
+                            <input type="hidden" name="book_id" value="<?= $book['book_id'] ?>">
+                            <button type="submit" class="btn btn-primary btn-lg">
+                                <i class="fas fa-cart-plus"></i> Add to Cart
+                            </button>
+                        </form>
+                        
+                        <a href="<?= BASE_URL ?>" class="btn btn-outline-secondary btn-lg">
+                            ← Back to list
+                        </a>
+                    </div>
+                </div>
             </div>
 
         <?php else: ?>

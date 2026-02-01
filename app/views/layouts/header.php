@@ -72,6 +72,23 @@ if (!defined('BASE_URL')) {
 
                     <li class="nav-item">
                         <a href="<?= url('index.php?action=index') ?>" class="nav-link">
+                            <i class="fa-solid fa-book"></i>
+                            Books
+                        </a>
+                    </li>
+
+                    <li class="nav-item">
+                        <a href="<?= url('index.php?action=cart-list') ?>" class="nav-link">
+                            <i class="fa-solid fa-cart-shopping"></i>
+                            Cart
+                            <?php if (isset($_SESSION['cart']) && count($_SESSION['cart']) > 0): ?>
+                                <span class="badge bg-danger rounded-pill"><?= count($_SESSION['cart']) ?></span>
+                            <?php endif; ?>
+                        </a>
+                    </li>
+
+                    <li class="nav-item">
+                        <a href="<?= url('index.php?action=index') ?>" class="nav-link">
                             <i class="fa-solid fa-tags"></i>
                             Categories
                         </a>

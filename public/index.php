@@ -7,6 +7,7 @@ require_once '../app/core/Database.php';
 require_once('../app/controllers/BookController.php');
 require_once('../app/controllers/AccountController.php');
 require_once('../app/controllers/AuthController.php');
+require_once('../app/controllers/CartController.php');
 
 
 // Get action from URL parameter, default to 'index' if not provided
@@ -16,6 +17,7 @@ $action = isset($_GET['action']) ? $_GET['action'] : 'index';
 $bookController = new BookController();
 $accountController = new AccountController();
 $authController = new AuthController();
+$cartController = new CartController();
 
 
 // Route based on action parameter
@@ -62,6 +64,21 @@ switch ($action) {
         break;
     case 'reset-password':
         $authController->resetPassword();
+        break;
+    case 'my-loans':
+        $accountController->myLoans();
+        break;
+    case 'cart-add':
+        $cartController->add();
+        break;
+    case 'cart-list':
+        $cartController->index();
+        break;
+    case 'cart-remove':
+        $cartController->remove();
+        break;
+    case 'cart-checkout':
+        $cartController->checkout();
         break;
     default:
         $bookController->index();
