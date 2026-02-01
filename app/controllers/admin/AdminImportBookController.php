@@ -14,7 +14,7 @@ class AdminImportBookController extends Controller
     public function importBooks()
     {
         $data = [
-            'title' => 'Import Sách từ CSV'
+            'title' => 'Import Books from CSV'
         ];
         
         $this->view('admin/books/import-books', $data);
@@ -34,36 +34,35 @@ class AdminImportBookController extends Controller
         ];
 
         try {
-            // Kiểm tra file upload
             if (!isset($_FILES['csv_file']) || $_FILES['csv_file']['error'] !== UPLOAD_ERR_OK) {
-                throw new Exception('Vui lòng chọn file CSV để upload');
+                throw new Exception('Please select a CSV file to upload');
             }
 
             $file = $_FILES['csv_file'];
             
-            // Kiểm tra định dạng file
             $fileExtension = strtolower(pathinfo($file['name'], PATHINFO_EXTENSION));
             if ($fileExtension !== 'csv') {
-                throw new Exception('Chỉ chấp nhận file CSV (.csv)');
+                throw new Exception('Only CSV files are allowed (.csv)');
             }
 
-            // Kiểm tra kích thước file (tối đa 5MB)
             if ($file['size'] > 5 * 1024 * 1024) {
-                throw new Exception('File quá lớn. Kích thước tối đa 5MB');
+                throw new Exception('File is too large. Maximum size is 5MB');
             }
+
+            // Clean encoding trước khi đọc
+            $this->cleanCSVEncoding($file['tmp_name']);
 
             // Đọc file CSV
             $csvData = $this->readCSVFile($file['tmp_name']);
 
             if (empty($csvData)) {
-                throw new Exception('File CSV không có dữ liệu');
+                throw new Exception('CSV file is empty');
             }
 
-            // Import sách
             $result = $this->bookModel->importBooks($csvData);
 
             $response['success'] = true;
-            $response['message'] = 'Import hoàn tất';
+            $response['message'] = 'Import completed';
             $response['result'] = $result;
 
         } catch (Exception $e) {
@@ -73,6 +72,37 @@ class AdminImportBookController extends Controller
 
         echo json_encode($response, JSON_UNESCAPED_UNICODE);
         exit;
+    }
+
+    /**
+     * Clean BOM và convert encoding về UTF-8
+     * Xử lý các ký tự đặc biệt như smart quotes (\x92, \x93, \x94, \x97)
+     */
+    private function cleanCSVEncoding($filePath)
+    {
+        $content = file_get_contents($filePath);
+
+        // Xóa BOM nếu có
+        $content = preg_replace('/^\xEF\xBB\xBF/', '', $content);
+
+        // Nếu file là Windows-1252 (có smart quotes), convert sang UTF-8
+        if (!mb_detect_encoding($content, 'UTF-8', true)) {
+            $content = mb_convert_encoding($content, 'UTF-8', 'Windows-1252');
+        }
+
+        // Replace các smart quotes còn lại về ký tự thường
+        $content = str_replace([
+            "\xe2\x80\x99", // ' (right single quote UTF-8)
+            "\xe2\x80\x98", // ' (left single quote UTF-8)
+            "\xe2\x80\x9c", // " (left double quote UTF-8)
+            "\xe2\x80\x9d", // " (right double quote UTF-8)
+            "\xe2\x80\x94", // — (em dash UTF-8)
+            "\xe2\x80\x93", // – (en dash UTF-8)
+        ], [
+            "'", "'", '"', '"', '-', '-'
+        ], $content);
+
+        file_put_contents($filePath, $content);
     }
 
     /**
@@ -86,29 +116,27 @@ class AdminImportBookController extends Controller
 
         if (($handle = fopen($filePath, 'r')) !== false) {
             
-            while (($row = fgetcsv($handle, 1000, ',')) !== false) {
+            while (($row = fgetcsv($handle, 0, ',', '"')) !== false) {
                 
-                // Dòng đầu tiên là header
                 if ($rowIndex === 0) {
+                    // Clean BOM từ header đầu tiên nếu còn
+                    $row[0] = preg_replace('/^\xEF\xBB\xBF/', '', $row[0]);
                     $headers = array_map('trim', $row);
                     
-                    // Kiểm tra header bắt buộc
                     if (!in_array('title', $headers) || !in_array('author', $headers)) {
                         fclose($handle);
-                        throw new Exception('File CSV phải có cột "title" và "author"');
+                        throw new Exception('CSV file must contain the columns "title" and "author"');
                     }
                     
                     $rowIndex++;
                     continue;
                 }
 
-                // Bỏ qua dòng trống
                 if (empty(array_filter($row))) {
                     $rowIndex++;
                     continue;
                 }
 
-                // Kết hợp header với dữ liệu
                 $bookData = [];
                 foreach ($headers as $index => $header) {
                     $bookData[$header] = isset($row[$index]) ? trim($row[$index]) : '';
@@ -120,7 +148,7 @@ class AdminImportBookController extends Controller
 
             fclose($handle);
         } else {
-            throw new Exception('Không thể đọc file CSV');
+            throw new Exception('Unable to read CSV file');
         }
 
         return $booksData;
@@ -133,25 +161,20 @@ class AdminImportBookController extends Controller
     {
         $filename = 'book_import_template.csv';
         
-        // Tạo header CSV
         $headers = ['title', 'author', 'category_name', 'publisher', 'publish_year', 'description', 'url'];
 
-        // Set headers để download
         header('Content-Type: text/csv; charset=utf-8');
         header('Content-Disposition: attachment; filename="' . $filename . '"');
         header('Pragma: no-cache');
         header('Expires: 0');
 
-        // Tạo output stream
         $output = fopen('php://output', 'w');
         
-        // Thêm BOM để Excel đọc UTF-8 đúng
+        // BOM
         fprintf($output, chr(0xEF).chr(0xBB).chr(0xBF));
 
-        // Ghi header
         fputcsv($output, $headers);
 
-        // Ghi một vài dòng mẫu
         fputcsv($output, [
             'Đắc Nhân Tâm',
             'Dale Carnegie',

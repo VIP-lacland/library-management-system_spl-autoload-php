@@ -11,17 +11,14 @@ class Book
 
     // ==================== CÁC HÀM CŨ (GIỮ NGUYÊN) ====================
 
-    // Lấy tất cả sách
     public function getAllBooks()
     {
         $sql = "SELECT book_id, title, author, publisher, publish_year, description, url FROM Books";
         $stmt = $this->db->prepare($sql);
         $stmt->execute();
-
         return $stmt->fetchAll();
     }
 
-    // Lấy sách theo phân trang
     public function getBooksPaginated($limit, $offset)
     {
         $sql = "SELECT book_id, title, author, publisher, publish_year, description, url 
@@ -35,7 +32,6 @@ class Book
         return $stmt->fetchAll();
     }
 
-    // Đếm tổng số sách
     public function countTotalBooks()
     {
         $stmt = $this->db->query("SELECT COUNT(*) as total FROM Books");
@@ -43,7 +39,6 @@ class Book
         return $row ? $row['total'] : 0;
     }
 
-    // Tìm kiếm sách
     public function searchBooks($keyword)
     {
         $keyword = "%$keyword%";
@@ -55,34 +50,24 @@ class Book
         return $stmt->fetchAll();
     }
 
-    // Lấy thông tin chi tiết sách
     public function getBookDetail($bookId)
     {
         $bookId = (int)$bookId;
-
         $sql = "
             SELECT 
-                b.book_id,
-                b.title,
-                b.author,
-                b.publisher,
-                b.publish_year,
-                b.description,
-                b.url,
+                b.book_id, b.title, b.author, b.publisher,
+                b.publish_year, b.description, b.url,
                 c.name AS category_name
             FROM Books b
             LEFT JOIN Categories c ON b.category_id = c.category_id
             WHERE b.book_id = :id
         ";
-
         $stmt = $this->db->prepare($sql);
         $stmt->execute(['id' => $bookId]);
-
         $book = $stmt->fetch();
         return $book ? $book : null;
     }
 
-    // Lấy sách theo ID
     public function getById($id)
     {
         $stmt = $this->db->prepare("SELECT * FROM Books WHERE book_id = :id");
@@ -90,21 +75,17 @@ class Book
         return $stmt->fetch();
     }
 
-    // Thống kê trạng thái sách
     public function getBookItemsStatus($bookId)
     {
         $bookId = (int)$bookId;
-
         $sql = "
             SELECT status, COUNT(*) as total
             FROM Book_Items
             WHERE book_id = :id
             GROUP BY status
         ";
-
         $stmt = $this->db->prepare($sql);
         $stmt->execute(['id' => $bookId]);
-
         return $stmt->fetchAll();
     }
 
@@ -112,7 +93,6 @@ class Book
     {
         $sql = "INSERT INTO Books (title, author, category_id, publisher, publish_year, description, url) 
                 VALUES (:title, :author, :category_id, :publisher, :publish_year, :description, :url)";
-        
         $stmt = $this->db->prepare($sql);
         return $stmt->execute([
             ':title' => $data['title'],
@@ -128,15 +108,10 @@ class Book
     public function updateBook($id, $data)
     {
         $sql = "UPDATE Books 
-                SET title = :title, 
-                    author = :author, 
-                    category_id = :category_id,
-                    publisher = :publisher, 
-                    publish_year = :publish_year, 
-                    description = :description, 
-                    url = :url
+                SET title = :title, author = :author, category_id = :category_id,
+                    publisher = :publisher, publish_year = :publish_year, 
+                    description = :description, url = :url
                 WHERE book_id = :id";
-        
         $stmt = $this->db->prepare($sql);
         return $stmt->execute([
             ':title' => $data['title'],
@@ -152,14 +127,13 @@ class Book
 
     public function deleteBook($id)
     {
-        // Kiểm tra trước nếu cần
         $checkSql = "SELECT COUNT(*) as total FROM Book_Items WHERE book_id = :id";
         $checkStmt = $this->db->prepare($checkSql);
         $checkStmt->execute([':id' => $id]);
         $result = $checkStmt->fetch();
         
         if ($result && $result['total'] > 0) {
-            return false; // Không thể xóa vì còn bản sao
+            return false;
         }
         
         $sql = "DELETE FROM Books WHERE book_id = :id";
@@ -167,9 +141,6 @@ class Book
         return $stmt->execute([':id' => $id]);
     }
 
-    /**
-     * Lấy tất cả categories để hiển thị trong form
-     */
     public function getAllCategories()
     {
         $sql = "SELECT category_id, name FROM Categories ORDER BY name ASC";
@@ -180,29 +151,26 @@ class Book
 
     // ==================== CÁC HÀM MỚI CHO IMPORT CSV ====================
 
-    /**
-     * Kiểm tra sách đã tồn tại trong database chưa
-     */
+    private function resetAutoIncrement()
+    {
+        $stmt = $this->db->query("SELECT COALESCE(MAX(book_id), 0) + 1 AS next_id FROM Books");
+        $row = $stmt->fetch();
+        $nextId = (int)$row['next_id'];
+        $this->db->exec("ALTER TABLE Books AUTO_INCREMENT = " . $nextId);
+    }
+
     public function bookExists($title, $author)
     {
         $sql = "SELECT COUNT(*) as total 
                 FROM Books 
                 WHERE LOWER(TRIM(title)) = LOWER(TRIM(:title)) 
                 AND LOWER(TRIM(author)) = LOWER(TRIM(:author))";
-        
         $stmt = $this->db->prepare($sql);
-        $stmt->execute([
-            ':title' => $title,
-            ':author' => $author
-        ]);
-        
+        $stmt->execute([':title' => $title, ':author' => $author]);
         $result = $stmt->fetch();
         return $result && $result['total'] > 0;
     }
 
-    /**
-     * Lấy category_id từ tên category. Nếu không tồn tại, tạo mới.
-     */
     public function getCategoryIdByName($categoryName)
     {
         if (empty($categoryName) || !is_string($categoryName)) {
@@ -214,26 +182,20 @@ class Book
             return null;
         }
 
-        // Search for existing category (case-insensitive and trim spaces)
         $sql = "SELECT category_id FROM Categories WHERE LOWER(TRIM(name)) = LOWER(TRIM(:name)) LIMIT 1";
         $stmt = $this->db->prepare($sql);
         $stmt->execute([':name' => $trimmedCategoryName]);
         $result = $stmt->fetch();
 
         if ($result) {
-            // Return existing category ID
             return $result['category_id'];
         } else {
-            // Category not found, create it
             try {
                 $categoryModel = new Category();
-                // Use the trimmed name for insertion
                 if ($categoryModel->addCategory($trimmedCategoryName)) {
-                    // Return the new ID
                     return $this->db->lastInsertId();
                 }
             } catch (Exception $e) {
-                // Log error if needed, for now return null to avoid breaking the whole import
                 error_log('Failed to find or create category "' . $trimmedCategoryName . '": ' . $e->getMessage());
             }
             return null;
@@ -242,12 +204,12 @@ class Book
 
     /**
      * Validate dữ liệu sách từ CSV
+     * URL chấp nhận: http/https URL hoặc relative path (../../public/images/...)
      */
     private function validateBookData($bookData)
     {
         $errors = [];
 
-        // Kiểm tra trường bắt buộc
         if (empty(trim($bookData['title']))) {
             $errors[] = "Tên sách không được để trống";
         }
@@ -256,7 +218,6 @@ class Book
             $errors[] = "Tác giả không được để trống";
         }
 
-        // Kiểm tra độ dài
         if (!empty($bookData['title']) && mb_strlen($bookData['title']) > 255) {
             $errors[] = "Tên sách quá dài (tối đa 255 ký tự)";
         }
@@ -265,7 +226,6 @@ class Book
             $errors[] = "Tên tác giả quá dài (tối đa 255 ký tự)";
         }
 
-        // Kiểm tra năm xuất bản
         if (!empty($bookData['publish_year'])) {
             $year = (int)$bookData['publish_year'];
             if ($year < 1000 || $year > date('Y') + 1) {
@@ -273,9 +233,15 @@ class Book
             }
         }
 
-        // Kiểm tra URL
+        // Validate URL: chấp nhận http/https URL hoặc relative path
         if (!empty($bookData['url'])) {
-            if (!filter_var($bookData['url'], FILTER_VALIDATE_URL)) {
+            $url = trim($bookData['url']);
+            $isValidUrl = filter_var($url, FILTER_VALIDATE_URL);           // http(s)://...
+            $isRelativePath = preg_match('/^\.\.\//', $url)                 // ../...
+                           || preg_match('/^\//', $url)                     // /...
+                           || preg_match('/^[a-zA-Z0-9_\-\.\/]+\.(jpg|jpeg|png|gif|webp|svg)$/i', $url); // filename.jpg
+
+            if (!$isValidUrl && !$isRelativePath) {
                 $errors[] = "URL hình ảnh không hợp lệ";
             }
         }
@@ -286,9 +252,6 @@ class Book
         ];
     }
 
-    /**
-     * Import nhiều sách từ mảng dữ liệu CSV
-     */
     public function importBooks($booksData)
     {
         $result = [
@@ -300,12 +263,12 @@ class Book
         ];
 
         try {
+            $this->resetAutoIncrement();
             $this->db->beginTransaction();
 
             foreach ($booksData as $index => $bookData) {
-                $rowNumber = $index + 2; // +2 vì row 1 là header, bắt đầu từ row 2
+                $rowNumber = $index + 2;
 
-                // Validate dữ liệu
                 $validation = $this->validateBookData($bookData);
                 if (!$validation['valid']) {
                     $result['failed']++;
@@ -313,7 +276,6 @@ class Book
                     continue;
                 }
 
-                // Lấy category_id từ tên category nếu có
                 if (!empty($bookData['category_name'])) {
                     $categoryId = $this->getCategoryIdByName($bookData['category_name']);
                     $bookData['category_id'] = $categoryId;
@@ -321,7 +283,6 @@ class Book
                     $bookData['category_id'] = null;
                 }
 
-                // Thêm sách
                 try {
                     if ($this->addBook($bookData)) {
                         $result['success']++;
