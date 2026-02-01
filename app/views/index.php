@@ -1,5 +1,32 @@
 <?php require_once __DIR__ . '/layouts/header.php'; ?>
 
+<?php
+// Logic tìm kiếm cho User
+$keyword = isset($_GET['keyword']) ? trim($_GET['keyword']) : '';
+
+if (!empty($keyword)) {
+    // Sử dụng Database singleton để lấy kết nối thay vì global $conn
+    $db = Database::getInstance()->getConnection();
+    
+    $sql = "SELECT b.*, c.name AS category_name 
+            FROM Books b 
+            LEFT JOIN Categories c ON b.category_id = c.category_id
+            WHERE b.title LIKE :kw1 
+               OR b.author LIKE :kw2 
+               OR b.publisher LIKE :kw3 
+               OR c.name LIKE :kw4";
+
+    $stmt = $db->prepare($sql);
+    $searchParam = "%" . $keyword . "%";
+    $stmt->bindValue(':kw1', $searchParam);
+    $stmt->bindValue(':kw2', $searchParam);
+    $stmt->bindValue(':kw3', $searchParam);
+    $stmt->bindValue(':kw4', $searchParam);
+    $stmt->execute();
+    $books = $stmt->fetchAll(PDO::FETCH_ASSOC);
+}
+?>
+
 <main class="container">
     <div class="row g-4 mt-3">
         <?php if (isset($books) && !empty($books)): ?>
@@ -31,5 +58,4 @@
         <?php endif; ?>
     </div>
 </main>
-
 <?php require_once __DIR__ . '/layouts/footer.php'; ?>

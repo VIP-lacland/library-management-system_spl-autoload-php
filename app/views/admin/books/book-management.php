@@ -42,7 +42,7 @@
                                        placeholder="Search by title, author, publisher..." 
                                        value="<?= htmlspecialchars($data['keyword'] ?? '') ?>">
                                 <button type="submit" class="btn btn-outline-primary">Search</button>
-                                <?php if (!empty($data['keyword'])): ?>
+                                <?php if (!empty($keyword)): ?>
                                     <a href="<?= url('admin.php?action=book-management') ?>" class="btn btn-outline-secondary ms-2">Clear</a>
                                 <?php endif; ?>
                             </form>
@@ -130,7 +130,7 @@
                                 <!-- Previous Button -->
                                 <li class="page-item <?= ($data['currentPage'] <= 1) ? 'disabled' : '' ?>">
                                     <a class="page-link" 
-                                       href="<?= url('admin.php?action=book-management&page=' . ($data['currentPage'] - 1) . (!empty($data['keyword']) ? '&keyword=' . urlencode($data['keyword']) : '')) ?>">
+                                       href="admin.php?action=book-management&page=<?= $currentPage - 1 ?><?= !empty($keyword) ? '&keyword=' . urlencode($keyword) : '' ?>">
                                         <i class="fas fa-chevron-left"></i> Previous
                                     </a>
                                 </li>
@@ -142,7 +142,7 @@
 
                                 if ($startPage > 1): ?>
                                     <li class="page-item">
-                                        <a class="page-link" href="<?= url('admin.php?action=book-management&page=1' . (!empty($data['keyword']) ? '&keyword=' . urlencode($data['keyword']) : '')) ?>">1</a>
+                                        <a class="page-link" href="admin.php?action=book-management&page=1<?= !empty($keyword) ? '&keyword=' . urlencode($keyword) : '' ?>">1</a>
                                     </li>
                                     <?php if ($startPage > 2): ?>
                                         <li class="page-item disabled"><span class="page-link">...</span></li>
@@ -152,7 +152,7 @@
                                 <?php for ($i = $startPage; $i <= $endPage; $i++): ?>
                                     <li class="page-item <?= ($i == $data['currentPage']) ? 'active' : '' ?>">
                                         <a class="page-link" 
-                                           href="<?= url('admin.php?action=book-management&page=' . $i . (!empty($data['keyword']) ? '&keyword=' . urlencode($data['keyword']) : '')) ?>">
+                                           href="admin.php?action=book-management&page=<?= $i ?><?= !empty($keyword) ? '&keyword=' . urlencode($keyword) : '' ?>">
                                             <?= $i ?>
                                         </a>
                                     </li>
@@ -164,8 +164,8 @@
                                     <?php endif; ?>
                                     <li class="page-item">
                                         <a class="page-link" 
-                                           href="<?= url('admin.php?action=book-management&page=' . $data['totalPages'] . (!empty($data['keyword']) ? '&keyword=' . urlencode($data['keyword']) : '')) ?>">
-                                            <?= $data['totalPages'] ?>
+                                           href="admin.php?action=book-management&page=<?= $totalPages ?><?= !empty($keyword) ? '&keyword=' . urlencode($keyword) : '' ?>">
+                                            <?= $totalPages ?>
                                         </a>
                                     </li>
                                 <?php endif; ?>
@@ -173,7 +173,7 @@
                                 <!-- Next Button -->
                                 <li class="page-item <?= ($data['currentPage'] >= $data['totalPages']) ? 'disabled' : '' ?>">
                                     <a class="page-link" 
-                                       href="<?= url('admin.php?action=book-management&page=' . ($data['currentPage'] + 1) . (!empty($data['keyword']) ? '&keyword=' . urlencode($data['keyword']) : '')) ?>">
+                                       href="admin.php?action=book-management&page=<?= $currentPage + 1 ?><?= !empty($keyword) ? '&keyword=' . urlencode($keyword) : '' ?>">
                                         Next <i class="fas fa-chevron-right"></i>
                                     </a>
                                 </li>

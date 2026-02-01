@@ -19,37 +19,56 @@ class Book
         return $stmt->fetchAll();
     }
 
-    public function getBooksPaginated($limit, $offset)
+    // Lấy sách theo phân trang
+    public function getBooksPaginated($limit, $offset, $keyword = '')
     {
-        $sql = "SELECT book_id, title, author, publisher, publish_year, description, url 
-                FROM Books 
-                ORDER BY book_id DESC
-                LIMIT :limit OFFSET :offset";
+        $sql = "SELECT b.book_id, b.title, b.author, b.publisher, b.publish_year, b.description, b.url, c.name as category_name
+                FROM Books b
+                LEFT JOIN Categories c ON b.category_id = c.category_id";
+        
+        if (!empty($keyword)) {
+            $sql .= " WHERE b.title LIKE :kw1 OR b.author LIKE :kw2 OR b.publisher LIKE :kw3 OR c.name LIKE :kw4";
+        }
+
+        $sql .= " ORDER BY b.book_id DESC LIMIT :limit OFFSET :offset";
+
         $stmt = $this->db->prepare($sql);
+
+        if (!empty($keyword)) {
+            $searchParam = "%$keyword%";
+            $stmt->bindValue(':kw1', $searchParam);
+            $stmt->bindValue(':kw2', $searchParam);
+            $stmt->bindValue(':kw3', $searchParam);
+            $stmt->bindValue(':kw4', $searchParam);
+        }
+
         $stmt->bindValue(':limit', (int)$limit, PDO::PARAM_INT);
         $stmt->bindValue(':offset', (int)$offset, PDO::PARAM_INT);
         $stmt->execute();
         return $stmt->fetchAll();
     }
 
-    public function countTotalBooks()
+    // Đếm tổng số sách (có thể tìm kiếm)
+    public function countTotalBooks($keyword = '')
     {
-        $stmt = $this->db->query("SELECT COUNT(*) as total FROM Books");
+        $sql = "SELECT COUNT(b.book_id) as total FROM Books b LEFT JOIN Categories c ON b.category_id = c.category_id";
+        if (!empty($keyword)) {
+            $sql .= " WHERE b.title LIKE :kw1 OR b.author LIKE :kw2 OR b.publisher LIKE :kw3 OR c.name LIKE :kw4";
+        }
+        $stmt = $this->db->prepare($sql);
+        if (!empty($keyword)) {
+            $searchParam = "%$keyword%";
+            $stmt->bindValue(':kw1', $searchParam);
+            $stmt->bindValue(':kw2', $searchParam);
+            $stmt->bindValue(':kw3', $searchParam);
+            $stmt->bindValue(':kw4', $searchParam);
+        }
+        $stmt->execute();
         $row = $stmt->fetch();
         return $row ? $row['total'] : 0;
     }
 
-    public function searchBooks($keyword)
-    {
-        $keyword = "%$keyword%";
-        $sql = "SELECT book_id, title, author, publisher, publish_year, description, url 
-                FROM Books 
-                WHERE title LIKE :keyword OR author LIKE :keyword OR publisher LIKE :keyword";
-        $stmt = $this->db->prepare($sql);
-        $stmt->execute(['keyword' => $keyword]);
-        return $stmt->fetchAll();
-    }
-
+    // Lấy thông tin chi tiết sách
     public function getBookDetail($bookId)
     {
         $bookId = (int)$bookId;

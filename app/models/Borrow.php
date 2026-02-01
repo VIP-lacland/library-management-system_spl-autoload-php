@@ -84,17 +84,21 @@ class Borrow {
 
     // Tìm kiếm phiếu mượn
     public function searchLoans($keyword) {
-        $keyword = "%$keyword%";
         $sql = "SELECT l.*, u.name as user_name, u.email, b.title as book_title, bi.barcode 
                 FROM Loans l
                 JOIN Users u ON l.user_id = u.user_id
                 JOIN Book_Items bi ON l.book_items_id = bi.book_items_id
                 JOIN Books b ON bi.book_id = b.book_id
-                WHERE u.name LIKE :keyword OR u.email LIKE :keyword OR b.title LIKE :keyword OR bi.barcode LIKE :keyword
+                WHERE u.name LIKE :kw1 OR u.email LIKE :kw2 OR b.title LIKE :kw3 OR bi.barcode LIKE :kw4
                 ORDER BY l.borrow_date DESC";
         
         $stmt = $this->db->prepare($sql);
-        $stmt->execute(['keyword' => $keyword]);
+        $searchParam = "%$keyword%";
+        $stmt->bindValue(':kw1', $searchParam);
+        $stmt->bindValue(':kw2', $searchParam);
+        $stmt->bindValue(':kw3', $searchParam);
+        $stmt->bindValue(':kw4', $searchParam);
+        $stmt->execute();
         return $stmt->fetchAll();
     }
 
@@ -107,7 +111,7 @@ class Borrow {
                 JOIN Books b ON bi.book_id = b.book_id";
         
         if (!empty($keyword)) {
-            $sql .= " WHERE u.name LIKE :keyword OR u.email LIKE :keyword OR b.title LIKE :keyword OR bi.barcode LIKE :keyword";
+            $sql .= " WHERE u.name LIKE :kw1 OR u.email LIKE :kw2 OR b.title LIKE :kw3 OR bi.barcode LIKE :kw4";
         }
         
         $sql .= " ORDER BY l.borrow_date DESC LIMIT :limit OFFSET :offset";
@@ -115,7 +119,11 @@ class Borrow {
         $stmt = $this->db->prepare($sql);
         
         if (!empty($keyword)) {
-            $stmt->bindValue(':keyword', "%$keyword%");
+            $searchParam = "%$keyword%";
+            $stmt->bindValue(':kw1', $searchParam);
+            $stmt->bindValue(':kw2', $searchParam);
+            $stmt->bindValue(':kw3', $searchParam);
+            $stmt->bindValue(':kw4', $searchParam);
         }
         $stmt->bindValue(':limit', (int)$limit, PDO::PARAM_INT);
         $stmt->bindValue(':offset', (int)$offset, PDO::PARAM_INT);
@@ -133,12 +141,16 @@ class Borrow {
                 JOIN Books b ON bi.book_id = b.book_id";
         
         if (!empty($keyword)) {
-            $sql .= " WHERE u.name LIKE :keyword OR u.email LIKE :keyword OR b.title LIKE :keyword OR bi.barcode LIKE :keyword";
+            $sql .= " WHERE u.name LIKE :kw1 OR u.email LIKE :kw2 OR b.title LIKE :kw3 OR bi.barcode LIKE :kw4";
         }
         
         $stmt = $this->db->prepare($sql);
         if (!empty($keyword)) {
-            $stmt->bindValue(':keyword', "%$keyword%");
+            $searchParam = "%$keyword%";
+            $stmt->bindValue(':kw1', $searchParam);
+            $stmt->bindValue(':kw2', $searchParam);
+            $stmt->bindValue(':kw3', $searchParam);
+            $stmt->bindValue(':kw4', $searchParam);
         }
         $stmt->execute();
         $row = $stmt->fetch();

@@ -21,29 +21,16 @@ class AdminBookController extends Controller
         $limit = 10;
         $keyword = isset($_GET['keyword']) ? trim($_GET['keyword']) : '';
         $currentPage = isset($_GET['page']) ? max(1, (int)$_GET['page']) : 1;
-        $offset = ($currentPage - 1) * $limit;
 
-        if (!empty($keyword)) {
-            $books = $this->bookModel->searchBooks($keyword);
-            $totalBooks = count($books);
-            $totalPages = ceil($totalBooks / $limit);
-            if ($totalBooks > 0) {
-                $books = array_slice($books, $offset, $limit);
-            }
-        } else {
-            $books = $this->bookModel->getBooksPaginated($limit, $offset);
-            $totalBooks = $this->bookModel->countTotalBooks();
-            $totalPages = ceil($totalBooks / $limit);
-        }
+        $totalBooks = $this->bookModel->countTotalBooks($keyword);
+        $totalPages = $totalBooks > 0 ? ceil($totalBooks / $limit) : 1;
 
         if ($currentPage > $totalPages && $totalPages > 0) {
             $currentPage = $totalPages;
-            $redirectUrl = !empty($keyword)
-                ? 'admin.php?action=book-management&page=' . $currentPage . '&keyword=' . urlencode($keyword)
-                : 'admin.php?action=book-management&page=' . $currentPage;
-            $this->redirect(url($redirectUrl));
-            return;
         }
+
+        $offset = ($currentPage - 1) * $limit;
+        $books = $this->bookModel->getBooksPaginated($limit, $offset, $keyword);
 
         $data = [
             'books' => $books,

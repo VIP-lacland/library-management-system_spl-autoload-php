@@ -86,26 +86,28 @@ class User
     public function getTotalUsers(string $keyword = ''): int
     {
         $sql = "SELECT COUNT(*) FROM Users";
-        $params = [];
 
         if (!empty($keyword)) {
-            $sql .= " WHERE name LIKE :keyword OR email LIKE :keyword";
-            $params[':keyword'] = '%' . $keyword . '%';
+            $sql .= " WHERE name LIKE :kw1 OR email LIKE :kw2 OR phone LIKE :kw3";
         }
 
         $stmt = $this->db->prepare($sql);
-        $stmt->execute($params);
+        if (!empty($keyword)) {
+            $searchParam = '%' . $keyword . '%';
+            $stmt->bindValue(':kw1', $searchParam);
+            $stmt->bindValue(':kw2', $searchParam);
+            $stmt->bindValue(':kw3', $searchParam);
+        }
+        $stmt->execute();
         return (int)$stmt->fetchColumn();
     }
 
     public function getUsers(int $limit, int $offset, string $keyword = ''): array
     {
         $sql = "SELECT * FROM Users";
-        $params = [];
 
         if (!empty($keyword)) {
-            $sql .= " WHERE name LIKE :keyword OR email LIKE :keyword";
-            $params[':keyword'] = '%' . $keyword . '%';
+            $sql .= " WHERE name LIKE :kw1 OR email LIKE :kw2 OR phone LIKE :kw3";
         }
 
         $sql .= " ORDER BY 
@@ -115,9 +117,11 @@ class User
         
         $stmt = $this->db->prepare($sql);
 
-        // Bind keyword param if it exists
         if (!empty($keyword)) {
-            $stmt->bindValue(':keyword', $params[':keyword']);
+            $searchParam = '%' . $keyword . '%';
+            $stmt->bindValue(':kw1', $searchParam);
+            $stmt->bindValue(':kw2', $searchParam);
+            $stmt->bindValue(':kw3', $searchParam);
         }
 
         $stmt->bindValue(':limit', $limit, PDO::PARAM_INT);
