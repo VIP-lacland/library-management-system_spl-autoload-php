@@ -27,7 +27,7 @@ if (!defined('BASE_URL')) {
                 <span>Library System</span>
             </a>
 
-            <!-- Search Form (Đã sửa thành Form để hoạt động) -->
+            <!-- Search Form -->
             <form action="<?= url('index.php') ?>" method="GET" class="search-container">
                 <input type="hidden" name="action" value="index">
                 <input type="text" name="keyword" class="search-bar" placeholder="Search books, authors..." value="<?= isset($_GET['keyword']) ? htmlspecialchars($_GET['keyword']) : '' ?>">
@@ -41,7 +41,7 @@ if (!defined('BASE_URL')) {
                     <?php if ($_SESSION['user']['role'] === 'reader'): ?>
                         <span class="username">
                             <i class="fa-solid fa-user"></i>
-                            Hello, <?= htmlspecialchars($_SESSION['user']['username'] ?? '') ?>
+                            Hello, <?= htmlspecialchars($_SESSION['user']['name'] ?? '') ?>
                         </span>
                     <?php endif; ?>
                     <a href="<?= url('index.php?action=logout') ?>" class="logout-btn">
@@ -104,6 +104,7 @@ if (!defined('BASE_URL')) {
                         </a>
                         <div class="dropdown-content">
                             <a href="<?= url('index.php?action=index') ?>"><i class="fa-solid fa-user"></i> My Profile</a>
+                            <a href="<?= url('index.php?action=my-loans') ?>"><i class="fa-solid fa-hand-holding-heart"></i> My Borrowed Books</a>
                             <a href="<?= url('index.php?action=change-password') ?>"><i class="fa-solid fa-key"></i> Change Password</a>
                         </div>
                     </li>

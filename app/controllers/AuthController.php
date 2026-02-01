@@ -29,7 +29,7 @@ class AuthController extends Controller
         $userModel = $this->model('User');
         $user = $userModel->findByEmail($email);
 
-        //validate input
+        // Validate input
         if (!$user || $password !== $user['password']) {
             $this->setFlash('error', 'Invalid email or password');
             $this->redirect(url('index.php?action=login'));
@@ -42,12 +42,16 @@ class AuthController extends Controller
             exit;
         }
 
-         $_SESSION['user'] = [
-            'id' => $user['user_id'],
-            'username' => $user['name'],
-            'full_name' => $user['full_name'],
-            'email' => $user['email'],
-            'role' => $user['role'] 
+        // ✅ FIX: Lưu đầy đủ thông tin user vào session
+        //    - Đổi 'username' -> 'name' để khớp với borrow_form view
+        //    - Thêm 'phone' field cho borrow_form hiển thị
+        $_SESSION['user'] = [
+            'id'        => $user['user_id'],
+            'name'      => $user['name'],          // ← đổi từ 'username'
+            'full_name' => $user['full_name'] ?? '',
+            'email'     => $user['email'],
+            'phone'     => $user['phone'] ?? '',   // ← thêm phone
+            'role'      => $user['role'] 
         ];
 
         if ($user['role'] === 'admin') {
@@ -82,23 +86,18 @@ class AuthController extends Controller
             } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
                 $error = 'Invalid email address';
             } else {
-                // Check if the email exists in the system
                 $userModel = $this->model('User');
                 $user = $userModel->getUserByEmail($email);
 
                 if (!$user) {
-                    // Do not reveal if the user exists for security reasons
                     $message = 'If the email exists in our system, you will receive a password reset link';
                 } else {
-                    // Tạo token reset
                     $token = bin2hex(random_bytes(32));
                     $expiresAt = date('Y-m-d H:i:s', strtotime('+1 hour'));
 
                     if ($userModel->createPasswordReset($user->user_id, $email, $token, $expiresAt)) {
-                        // Tạo liên kết reset
                         $resetLink = url('index.php?action=reset-password&token=' . $token);
 
-                        // Gửi email (trong production sử dụng PHPMailer hoặc SwiftMailer)
                         $subject = 'Reset Password – Library Management System';
                         $body = "Hello " . $user->name . ",\n\n";
                         $body .= "You have requested to reset your password.\n";
@@ -111,7 +110,6 @@ class AuthController extends Controller
                         $headers = "From: noreply@library.com\r\n";
                         $headers .= "Content-Type: text/plain; charset=UTF-8\r\n";
 
-                        // Thực hiện gửi email (bạn cần cấu hình SMTP hoặc sử dụng mail())
                         mail($email, $subject, $body, $headers);
 
                         $message = 'If the email exists in our system, you will receive a password reset link.';
@@ -139,35 +137,33 @@ class AuthController extends Controller
             if (!$user) {
                 $error = 'Email does not exist.';
             } elseif ($user['role'] !== 'reader') {
-                $error = 'this feature is for reader only';
+                $error = 'This feature is for reader only.';
             } elseif (empty($password)) {
-                $error = 'Please enter a new password..';
+                $error = 'Please enter a new password.';
             } elseif (strlen($password) < 6) {
-                $error = 'Password must be at least 8 characters.';
+                // ✅ FIX: Error message nói "8 characters" nhưng check < 6, đổi cho nhất quán
+                $error = 'Password must be at least 6 characters.';
             } elseif ($password !== $password_confirm) {
                 $error = 'Passwords do not match.';
             } else {
                 if ($userModel->updatePassword($user['user_id'], $password)) {
                     $this->setFlash('success', 'Password has been reset successfully. Please log in.');
                     $this->redirect(url('index.php?action=login'));
-                    return; // Exit after redirect
+                    return;
                 } else {
                     $error = 'Something went wrong. Try again later.';
                 }
             }
             
-            // Redisplay form with error
             $this->view('auth/reset-password', ['error' => $error, 'email' => $email]);
 
         } else {
-            // Just show the form on GET request
             $this->view('auth/reset-password');
         }
     }
 
     public function resetPasswordForm()
     {
-        // This form is now handled by resetPassword() on GET request.
         $this->view('auth/reset-password');
     }
 }
