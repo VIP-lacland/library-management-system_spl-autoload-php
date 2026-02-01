@@ -6,131 +6,8 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="<?= asset('css/admin_dashboard.css') ?>">
+    <link rel="stylesheet" href="<?= asset('css/import-books.css') ?>">
     <title><?= $title ?? 'Import Books' ?></title>
-    <style>
-        .import-container {
-            background: white;
-            border-radius: 10px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-            padding: 30px;
-            margin-bottom: 20px;
-        }
-        .file-upload-area {
-            border: 3px dashed #dee2e6;
-            border-radius: 10px;
-            padding: 60px 20px;
-            text-align: center;
-            background: #f8f9fa;
-            transition: all 0.3s;
-            cursor: pointer;
-            margin: 20px 0;
-        }
-        .file-upload-area:hover {
-            border-color: #0dcaf0;
-            background: #e7f6fd;
-        }
-        .file-upload-area.active {
-            border-color: #0dcaf0;
-            background: #d1ecf1;
-        }
-        .file-upload-area i {
-            font-size: 60px;
-            color: #0dcaf0;
-            margin-bottom: 20px;
-        }
-        .result-box {
-            margin-top: 30px;
-            padding: 25px;
-            border-radius: 10px;
-            display: none;
-        }
-        .result-box.success {
-            background: #d4edda;
-            border: 2px solid #c3e6cb;
-        }
-        .result-box.error {
-            background: #f8d7da;
-            border: 2px solid #f5c6cb;
-        }
-        .stats {
-            display: flex;
-            gap: 15px;
-            margin: 25px 0;
-        }
-        .stat-item {
-            flex: 1;
-            text-align: center;
-            padding: 25px;
-            border-radius: 10px;
-            background: white;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-        }
-        .stat-item.success {
-            border-left: 5px solid #28a745;
-        }
-        .stat-item.warning {
-            border-left: 5px solid #ffc107;
-        }
-        .stat-item.error {
-            border-left: 5px solid #dc3545;
-        }
-        .stat-number {
-            font-size: 36px;
-            font-weight: bold;
-            margin-bottom: 5px;
-        }
-        .stat-label {
-            color: #6c757d;
-            font-size: 14px;
-        }
-        .error-list {
-            max-height: 350px;
-            overflow-y: auto;
-            margin-top: 20px;
-        }
-        .error-item {
-            padding: 12px 15px;
-            background: white;
-            margin: 8px 0;
-            border-radius: 6px;
-            border-left: 4px solid #dc3545;
-            font-size: 14px;
-        }
-        .loading {
-            display: none;
-            text-align: center;
-            padding: 50px;
-        }
-        .loading.active {
-            display: block;
-        }
-        .spinner {
-            border: 5px solid #f3f3f3;
-            border-top: 5px solid #0dcaf0;
-            border-radius: 50%;
-            width: 60px;
-            height: 60px;
-            animation: spin 1s linear infinite;
-            margin: 0 auto 20px;
-        }
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-        .section-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 25px;
-        }
-        .info-box {
-            background: #e7f3ff;
-            border-left: 4px solid #0dcaf0;
-            padding: 15px 20px;
-            margin: 20px 0;
-            border-radius: 5px;
-        }
-    </style>
 </head>
 
 <body>
@@ -149,12 +26,12 @@
                 <div class="section-header mt-4">
                     <div>
                         <h2 class="mb-2">
-                            <i class="fas fa-file-import text-info"></i> Import Sách từ CSV
+                            <i class="fas fa-file-import text-info"></i> Import Books from CSV
                         </h2>
-                        <p class="text-muted mb-0">Upload file CSV để thêm nhiều sách cùng lúc vào hệ thống</p>
+                        <p class="text-muted mb-0">Upload a CSV file to add multiple books to the system at once</p>
                     </div>
                     <a href="<?= url('admin.php?action=book-management') ?>" class="btn btn-secondary">
-                        <i class="fas fa-arrow-left"></i> Quay Lại
+                        <i class="fas fa-arrow-left"></i> Go Back
                     </a>
                 </div>
 
@@ -165,8 +42,8 @@
                         <div class="d-flex align-items-center">
                             <i class="fas fa-info-circle fa-2x text-info me-3"></i>
                             <div>
-                                <strong>Hướng dẫn:</strong> File CSV phải có cột <code>title</code> và <code>author</code>. 
-                                Các cột khác: <code>category_name</code>, <code>publisher</code>, <code>publish_year</code>, <code>description</code>, <code>url</code>.
+                                <strong>Instructions:</strong> CSV file must contain the column <code>title</code> and <code>author</code>. 
+                                Other columns: <code>category_name</code>, <code>publisher</code>, <code>publish_year</code>, <code>description</code>, <code>url</code>.
                             </div>
                         </div>
                     </div>
@@ -174,7 +51,7 @@
                     <!-- Download Template Button -->
                     <div class="text-center mb-4">
                         <a href="<?= url('admin.php?action=import-books-download-template') ?>" class="btn btn-outline-info">
-                            <i class="fas fa-download"></i> Tải File CSV Mẫu
+                            <i class="fas fa-download"></i> Download Sample CSV File
                         </a>
                     </div>
 
@@ -182,15 +59,15 @@
                     <form id="importForm" enctype="multipart/form-data">
                         <div class="file-upload-area" id="fileUploadArea">
                             <i class="fas fa-cloud-upload-alt"></i>
-                            <h4 class="mb-3">Chọn file CSV hoặc kéo thả vào đây</h4>
-                            <p class="text-muted mb-0">Chỉ chấp nhận file .csv (Tối đa 5MB)</p>
+                            <h4 class="mb-3">Select a CSV file or drag and drop it here</h4>
+                            <p class="text-muted mb-0">Only .csv files are allowed (Maximum 5MB)</p>
                             <input type="file" id="csv_file" name="csv_file" accept=".csv" style="display: none;">
                             <p class="text-success mt-3 mb-0 fw-bold" id="fileName" style="display: none;"></p>
                         </div>
 
                         <div class="text-center mt-4">
                             <button type="submit" class="btn btn-primary btn-lg px-5" id="importBtn">
-                                <i class="fas fa-upload"></i> Bắt Đầu Import
+                                <i class="fas fa-upload"></i> Start Import
                             </button>
                         </div>
                     </form>
@@ -198,8 +75,8 @@
                     <!-- Loading -->
                     <div class="loading" id="loading">
                         <div class="spinner"></div>
-                        <h5 class="text-primary">Đang xử lý dữ liệu...</h5>
-                        <p class="text-muted">Vui lòng đợi trong giây lát, đừng tắt trang này</p>
+                        <h5 class="text-primary">Processing data...</h5>
+                        <p class="text-muted">Please wait a moment, do not close this page</p>
                     </div>
 
                     <!-- Result Box -->
@@ -210,17 +87,17 @@
                             <div class="stat-item success">
                                 <i class="fas fa-check-circle fa-2x text-success mb-2"></i>
                                 <div class="stat-number text-success" id="successCount">0</div>
-                                <div class="stat-label">Thành Công</div>
+                                <div class="stat-label">Success</div>
                             </div>
                             <div class="stat-item warning">
                                 <i class="fas fa-exclamation-triangle fa-2x text-warning mb-2"></i>
                                 <div class="stat-number text-warning" id="skippedCount">0</div>
-                                <div class="stat-label">Bỏ Qua (Trùng)</div>
+                                <div class="stat-label">Skip (Duplicate)</div>
                             </div>
                             <div class="stat-item error">
                                 <i class="fas fa-times-circle fa-2x text-danger mb-2"></i>
                                 <div class="stat-number text-danger" id="failedCount">0</div>
-                                <div class="stat-label">Lỗi</div>
+                                <div class="stat-label">Error</div>
                             </div>
                         </div>
 
@@ -228,10 +105,10 @@
 
                         <div class="text-center mt-4">
                             <button class="btn btn-primary me-2" onclick="location.reload()">
-                                <i class="fas fa-redo"></i> Import File Khác
+                                <i class="fas fa-redo"></i>Import Another File”
                             </button>
                             <a href="<?= url('admin.php?action=book-management') ?>" class="btn btn-success">
-                                <i class="fas fa-list"></i> Xem Danh Sách Sách
+                                <i class="fas fa-list"></i> View Book List
                             </a>
                         </div>
                     </div>
@@ -294,7 +171,7 @@
                 fileName.innerHTML = '<i class="fas fa-check-circle"></i> Đã chọn: ' + files[0].name;
                 fileName.style.display = 'block';
             } else {
-                alert('Vui lòng chọn file CSV!');
+                alert('Please select a CSV file!');
             }
         });
 
@@ -303,7 +180,7 @@
             e.preventDefault();
 
             if (!fileInput.files || !fileInput.files[0]) {
-                alert('Vui lòng chọn file CSV!');
+                alert('Please select a CSV file!');
                 return;
             }
 
