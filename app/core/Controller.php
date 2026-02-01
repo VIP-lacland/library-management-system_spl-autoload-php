@@ -106,7 +106,7 @@ class Controller {
     protected function requireLogin() {
         if (!$this->isLoggedIn()) {
             $this->setFlash('error', 'Please log in to continue.');
-            $this->redirect('/login');
+            $this->redirect(url('index.php?action=login'));
         }
     }
 }

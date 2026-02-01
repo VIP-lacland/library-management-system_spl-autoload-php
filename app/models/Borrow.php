@@ -144,4 +144,63 @@ class Borrow {
         $row = $stmt->fetch();
         return $row ? $row['total'] : 0;
     }
+
+    // Tìm một bản sao sách đang có sẵn (available) và KHÔNG nằm trong danh sách chờ duyệt (pending)
+    public function findAvailableCopy($bookId) {
+        $sql = "SELECT bi.book_items_id 
+                FROM Book_Items bi
+                LEFT JOIN Loans l ON bi.book_items_id = l.book_items_id AND l.status = 'pending'
+                WHERE bi.book_id = :book_id 
+                AND bi.status NOT IN ('borrowed', 'lost', 'damaged', 'maintenance', 'Borrowed', 'Lost', 'Damaged')
+                AND l.loan_id IS NULL
+                LIMIT 1";
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute(['book_id' => $bookId]);
+        return $stmt->fetch();
+    }
+
+    // Tạo yêu cầu mượn mới (Pending)
+    public function createLoanRequest($userId, $bookItemId, $dueDate) {
+        // Ngày mượn là hôm nay, trạng thái pending
+        $borrowDate = date('Y-m-d');
+        
+        $sql = "INSERT INTO Loans (user_id, book_items_id, borrow_date, due_date, status) 
+                VALUES (:user_id, :item_id, :borrow_date, :due_date, 'pending')";
+        
+        $stmt = $this->db->prepare($sql);
+        return $stmt->execute([
+            'user_id' => $userId, 
+            'item_id' => $bookItemId, 
+            'borrow_date' => $borrowDate,
+            'due_date' => $dueDate
+        ]);
+    }
+
+    // Lấy lịch sử mượn của một user cụ thể
+    public function getUserLoans($userId) {
+        $sql = "SELECT l.*, b.title, b.author, bi.barcode, b.url 
+                FROM Loans l
+                JOIN Book_Items bi ON l.book_items_id = bi.book_items_id
+                JOIN Books b ON bi.book_id = b.book_id
+                WHERE l.user_id = :user_id
+                ORDER BY l.borrow_date DESC";
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute(['user_id' => $userId]);
+        return $stmt->fetchAll();
+    }
+
+    // Kiểm tra user có đang mượn hoặc chờ duyệt sách này không
+    public function isUserBorrowingBook($userId, $bookId) {
+        $sql = "SELECT COUNT(*) as total 
+                FROM Loans l
+                JOIN Book_Items bi ON l.book_items_id = bi.book_items_id
+                WHERE l.user_id = :user_id 
+                AND bi.book_id = :book_id 
+                AND l.status IN ('pending', 'borrowing')";
+        
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute(['user_id' => $userId, 'book_id' => $bookId]);
+        $row = $stmt->fetch();
+        return ($row && $row['total'] > 0);
+    }
 }

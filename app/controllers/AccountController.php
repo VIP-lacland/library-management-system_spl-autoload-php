@@ -140,4 +140,16 @@ class AccountController extends Controller
             $this->redirect(url('index.php?action=change-password'));
         }
     }
+
+    // Trang quản lý sách mượn của User
+    public function myLoans()
+    {
+        $this->requireLogin();
+        $userId = $_SESSION['user']['id'];
+        
+        $borrowModel = $this->model('Borrow');
+        $loans = $borrowModel->getUserLoans($userId);
+
+        $this->view('account/my_loans', ['loans' => $loans]);
+    }
 }

@@ -1,4 +1,4 @@
-﻿<?php
+﻿﻿<?php
 
 class Book
 {
@@ -13,7 +13,9 @@ class Book
 
     public function getAllBooks()
     {
-        $sql = "SELECT book_id, title, author, publisher, publish_year, description, url FROM Books";
+        $sql = "SELECT b.book_id, b.title, b.author, b.publisher, b.publish_year, b.description, b.url,
+                (SELECT COUNT(*) FROM Book_Items bi WHERE bi.book_id = b.book_id AND bi.status NOT IN ('borrowed', 'lost', 'damaged', 'maintenance', 'Borrowed', 'Lost', 'Damaged')) as available_count
+                FROM Books b";
         $stmt = $this->db->prepare($sql);
         $stmt->execute();
         return $stmt->fetchAll();
@@ -21,9 +23,10 @@ class Book
 
     public function getBooksPaginated($limit, $offset)
     {
-        $sql = "SELECT book_id, title, author, publisher, publish_year, description, url 
-                FROM Books 
-                ORDER BY book_id DESC
+        $sql = "SELECT b.book_id, b.title, b.author, b.publisher, b.publish_year, b.description, b.url,
+                (SELECT COUNT(*) FROM Book_Items bi WHERE bi.book_id = b.book_id AND bi.status NOT IN ('borrowed', 'lost', 'damaged', 'maintenance', 'Borrowed', 'Lost', 'Damaged')) as available_count
+                FROM Books b 
+                ORDER BY b.book_id DESC
                 LIMIT :limit OFFSET :offset";
         $stmt = $this->db->prepare($sql);
         $stmt->bindValue(':limit', (int)$limit, PDO::PARAM_INT);
@@ -42,9 +45,10 @@ class Book
     public function searchBooks($keyword)
     {
         $keyword = "%$keyword%";
-        $sql = "SELECT book_id, title, author, publisher, publish_year, description, url 
-                FROM Books 
-                WHERE title LIKE :keyword OR author LIKE :keyword OR publisher LIKE :keyword";
+        $sql = "SELECT b.book_id, b.title, b.author, b.publisher, b.publish_year, b.description, b.url,
+                (SELECT COUNT(*) FROM Book_Items bi WHERE bi.book_id = b.book_id AND bi.status NOT IN ('borrowed', 'lost', 'damaged', 'maintenance', 'Borrowed', 'Lost', 'Damaged')) as available_count
+                FROM Books b 
+                WHERE b.title LIKE :keyword OR b.author LIKE :keyword OR b.publisher LIKE :keyword";
         $stmt = $this->db->prepare($sql);
         $stmt->execute(['keyword' => $keyword]);
         return $stmt->fetchAll();
