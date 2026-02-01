@@ -39,14 +39,14 @@ require_once __DIR__ . '../../../../config/config.php';
                     <!-- Search and Add -->
                     <div class="row mb-3">
                         <div class="col-md-6">
-                            <form method="GET" action="admin.php" class="d-flex">
-                                <input type="hidden" name="action" value="books">
+                            <form method="GET" action="<?= url('admin.php') ?>" class="d-flex">
+                                <input type="hidden" name="action" value="book-management">
                                 <input type="text" name="keyword" class="form-control me-2" 
                                        placeholder="Search by title, author, publisher..." 
                                        value="<?= htmlspecialchars($keyword ?? '') ?>">
                                 <button type="submit" class="btn btn-outline-primary">Search</button>
                                 <?php if (!empty($keyword)): ?>
-                                    <a href="admin.php?action=books" class="btn btn-outline-secondary ms-2">Clear</a>
+                                    <a href="<?= url('admin.php?action=book-management') ?>" class="btn btn-outline-secondary ms-2">Clear</a>
                                 <?php endif; ?>
                             </form>
                         </div>
@@ -129,7 +129,7 @@ require_once __DIR__ . '../../../../config/config.php';
                                 <!-- Previous Button -->
                                 <li class="page-item <?= ($currentPage <= 1) ? 'disabled' : '' ?>">
                                     <a class="page-link" 
-                                       href="admin.php?action=books&page=<?= $currentPage - 1 ?><?= !empty($keyword) ? '&keyword=' . urlencode($keyword) : '' ?>">
+                                       href="admin.php?action=book-management&page=<?= $currentPage - 1 ?><?= !empty($keyword) ? '&keyword=' . urlencode($keyword) : '' ?>">
                                         <i class="fas fa-chevron-left"></i> Previous
                                     </a>
                                 </li>
@@ -142,7 +142,7 @@ require_once __DIR__ . '../../../../config/config.php';
                                 // Show first page
                                 if ($startPage > 1): ?>
                                     <li class="page-item">
-                                        <a class="page-link" href="admin.php?action=books&page=1<?= !empty($keyword) ? '&keyword=' . urlencode($keyword) : '' ?>">1</a>
+                                        <a class="page-link" href="admin.php?action=book-management&page=1<?= !empty($keyword) ? '&keyword=' . urlencode($keyword) : '' ?>">1</a>
                                     </li>
                                     <?php if ($startPage > 2): ?>
                                         <li class="page-item disabled"><span class="page-link">...</span></li>
@@ -152,7 +152,7 @@ require_once __DIR__ . '../../../../config/config.php';
                                 <?php for ($i = $startPage; $i <= $endPage; $i++): ?>
                                     <li class="page-item <?= ($i == $currentPage) ? 'active' : '' ?>">
                                         <a class="page-link" 
-                                           href="admin.php?action=books&page=<?= $i ?><?= !empty($keyword) ? '&keyword=' . urlencode($keyword) : '' ?>">
+                                           href="admin.php?action=book-management&page=<?= $i ?><?= !empty($keyword) ? '&keyword=' . urlencode($keyword) : '' ?>">
                                             <?= $i ?>
                                         </a>
                                     </li>
@@ -165,7 +165,7 @@ require_once __DIR__ . '../../../../config/config.php';
                                     <?php endif; ?>
                                     <li class="page-item">
                                         <a class="page-link" 
-                                           href="admin.php?action=books&page=<?= $totalPages ?><?= !empty($keyword) ? '&keyword=' . urlencode($keyword) : '' ?>">
+                                           href="admin.php?action=book-management&page=<?= $totalPages ?><?= !empty($keyword) ? '&keyword=' . urlencode($keyword) : '' ?>">
                                             <?= $totalPages ?>
                                         </a>
                                     </li>
@@ -174,7 +174,7 @@ require_once __DIR__ . '../../../../config/config.php';
                                 <!-- Next Button -->
                                 <li class="page-item <?= ($currentPage >= $totalPages) ? 'disabled' : '' ?>">
                                     <a class="page-link" 
-                                       href="admin.php?action=books&page=<?= $currentPage + 1 ?><?= !empty($keyword) ? '&keyword=' . urlencode($keyword) : '' ?>">
+                                       href="admin.php?action=book-management&page=<?= $currentPage + 1 ?><?= !empty($keyword) ? '&keyword=' . urlencode($keyword) : '' ?>">
                                         Next <i class="fas fa-chevron-right"></i>
                                     </a>
                                 </li>

@@ -27,12 +27,14 @@ if (!defined('BASE_URL')) {
                 <span>Library System</span>
             </a>
 
-            <div class="search-container">
-                <input type="text" class="search-bar" placeholder="Search books, authors, categories...">
-                <button class="search-btn">
+            <!-- Search Form (Đã sửa thành Form để hoạt động) -->
+            <form action="<?= url('index.php') ?>" method="GET" class="search-container">
+                <input type="hidden" name="action" value="index">
+                <input type="text" name="keyword" class="search-bar" placeholder="Search books, authors..." value="<?= isset($_GET['keyword']) ? htmlspecialchars($_GET['keyword']) : '' ?>">
+                <button type="submit" class="search-btn">
                     <i class="fa-solid fa-magnifying-glass"></i>
                 </button>
-            </div>
+            </form>
 
             <?php if (isset($_SESSION['user'])): ?>
                 <div class="user-menu">
