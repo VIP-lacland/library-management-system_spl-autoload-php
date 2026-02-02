@@ -76,7 +76,7 @@ class AdminImportBookController extends Controller
 
     /**
      * Clean BOM và convert encoding về UTF-8
-     * Xử lý các ký tự đặc biệt như smart quotes (\x92, \x93, \x94, \x97)
+     * Xử lý các ký tự đặc biệt như smart quotes
      */
     private function cleanCSVEncoding($filePath)
     {

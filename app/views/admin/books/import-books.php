@@ -211,7 +211,7 @@
 
             } catch (error) {
                 loading.classList.remove('active');
-                showResult({ errors: ['Lỗi kết nối: ' + error.message] }, 'error');
+                showResult({ errors: ['Connection error: ' + error.message] }, 'error');
             }
         });
 

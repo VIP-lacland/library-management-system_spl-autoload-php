@@ -191,7 +191,7 @@ class Book
         $nextId = (int)$row['next_id'];
         $this->db->exec("ALTER TABLE Books AUTO_INCREMENT = " . $nextId);
     }
-
+    // check duplicate
     public function bookExists($title, $author)
     {
         $sql = "SELECT COUNT(*) as total 
@@ -237,6 +237,7 @@ class Book
 
     /**
      * Validate dữ liệu sách từ CSV
+     * 
      * URL chấp nhận: http/https URL hoặc relative path (../../public/images/...)
      */
     private function validateBookData($bookData)
@@ -266,7 +267,7 @@ class Book
             }
         }
 
-        // Validate URL: chấp nhận http/https URL hoặc relative path
+     
         if (!empty($bookData['url'])) {
             $url = trim($bookData['url']);
             $isValidUrl = filter_var($url, FILTER_VALIDATE_URL);           // http(s)://...
