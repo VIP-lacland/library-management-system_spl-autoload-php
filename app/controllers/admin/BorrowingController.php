@@ -2,61 +2,77 @@
 
 class BorrowingController extends Controller
 {
+    private $borrowModel;
+
+    public function __construct()
+    {
+        // A robust role-based access control system is recommended for a real application.
+        if (!isset($_SESSION['user']) || $_SESSION['user']['role'] !== 'admin') {
+            $this->setFlash('error', 'Access Denied: You do not have permission to access this page.');
+            if (!isset($_SESSION['user'])) {
+                $this->redirect('index.php?action=login');
+            } else {
+                $this->redirect('index.php');
+            }
+            exit;
+        }
+        $this->borrowModel = $this->model('Borrow');
+    }
 
     public function listBorrowings()
     {
-        $borrowModel = $this->model('Borrow');
-
         $keyword = isset($_GET['keyword']) ? trim($_GET['keyword']) : '';
         $page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
-        if ($page < 1) $page = 1;
+        $page = max(1, $page);
         $limit = 10;
         $offset = ($page - 1) * $limit;
 
-        $loans = $borrowModel->getLoansPaginated($limit, $offset, $keyword);
-        $totalLoans = $borrowModel->countLoans($keyword);
-        $totalPages = ceil($totalLoans / $limit);
-
-        $title = 'All Borrowing History';
+        $loans = $this->borrowModel->getLoansPaginated($limit, $offset, $keyword);
+        $totalLoans = $this->borrowModel->countLoans($keyword);
+        $totalPages = $totalLoans > 0 ? ceil($totalLoans / $limit) : 0;
 
         $this->view('admin/borrowing/borrowing-list', [
             'loans' => $loans,
-            'title' => $title,
+            'title' => 'All Borrowing History',
             'keyword' => $keyword,
             'currentPage' => $page,
-            'totalPages' => $totalPages
+            'totalPages' => $totalPages,
+            'success' => $this->getFlash('success'),
+            'error' => $this->getFlash('error')
         ]);
     }
 
     public function requests()
     {
-        $borrowModel = $this->model('Borrow');
-        $requests = $borrowModel->getAllLoans('pending');
-        $title = 'Borrow Requests';
-        $this->view('admin/borrowing/pending', ['requests' => $requests, 'title' => $title]);
+        $requests = $this->borrowModel->getAllLoans('pending');
+        $this->view('admin/borrowing/pending', [
+            'requests' => $requests,
+            'title' => 'Borrow Requests',
+            'success' => $this->getFlash('success'),
+            'error' => $this->getFlash('error')
+        ]);
     }
+
     public function overdue()
     {
-        $borrowModel = $this->model('Borrow');
-        $overdueLoans = $borrowModel->getOverdueLoans();
-        $title = 'Overdue Books';
-        $this->view('admin/borrowing/overdue', ['overdueLoans' => $overdueLoans, 'title' => $title]);
+        $overdueLoans = $this->borrowModel->getOverdueLoans();
+        $this->view('admin/borrowing/overdue', [
+            'overdueLoans' => $overdueLoans,
+            'title' => 'Overdue Books',
+            'success' => $this->getFlash('success'),
+            'error' => $this->getFlash('error')
+        ]);
     }
 
     public function approve()
     {
-        if ($this->isGet()) {
-            $id = isset($_GET['id']) ? (int)$_GET['id'] : 0;
-            if ($id > 0) {
-                $borrowModel = $this->model('Borrow');
-
-                $dueDate = date('Y-m-d', strtotime('+14 days'));
-
-                if ($borrowModel->approveRequest($id, $dueDate)) {
-                    $this->setFlash('success', 'Request approved successfully.');
-                } else {
-                    $this->setFlash('error', 'Failed to approve request.');
-                }
+        $id = isset($_GET['id']) ? (int)$_GET['id'] : 0;
+        if ($this->isGet() && $id > 0) {
+            $dueDate = date('Y-m-d', strtotime('+14 days'));
+            if ($this->borrowModel->approveRequest($id, $dueDate)) {
+                $this->setFlash('success', 'Request approved successfully.');
+            } else {
+                $this->setFlash('error', 'Failed to approve request. It may have been processed already.');
             }
         }
         $this->redirect('admin.php?action=borrow-requests');
@@ -64,15 +80,12 @@ class BorrowingController extends Controller
 
     public function reject()
     {
-        if ($this->isGet()) {
-            $id = isset($_GET['id']) ? (int)$_GET['id'] : 0;
-            if ($id > 0) {
-                $borrowModel = $this->model('Borrow');
-                if ($borrowModel->rejectRequest($id)) {
-                    $this->setFlash('success', 'Request rejected.');
-                } else {
-                    $this->setFlash('error', 'Failed to reject request.');
-                }
+        $id = isset($_GET['id']) ? (int)$_GET['id'] : 0;
+        if ($this->isGet() && $id > 0) {
+            if ($this->borrowModel->rejectRequest($id)) {
+                $this->setFlash('success', 'Request rejected successfully.');
+            } else {
+                $this->setFlash('error', 'Failed to reject request. It may have been processed already.');
             }
         }
         $this->redirect('admin.php?action=borrow-requests');
@@ -80,17 +93,18 @@ class BorrowingController extends Controller
 
     public function returnBook()
     {
-        if ($this->isGet()) {
-            $id = isset($_GET['id']) ? (int)$_GET['id'] : 0;
-            if ($id > 0) {
-                $borrowModel = $this->model('Borrow');
-                if ($borrowModel->returnBook($id)) {
-                    $this->setFlash('success', 'Book returned successfully.');
-                } else {
-                    $this->setFlash('error', 'Failed to return book.');
-                }
+        $id = isset($_GET['id']) ? (int)$_GET['id'] : 0;
+        if ($this->isGet() && $id > 0) {
+            if ($this->borrowModel->returnBook($id)) {
+                $this->setFlash('success', 'Book marked as returned successfully.');
+            } else {
+                $this->setFlash('error', 'Failed to return book. It might have been returned already.');
             }
         }
-        $this->redirect('admin.php?action=borrow-list');
+
+        // Redirect back to the page the admin came from
+        $from = isset($_GET['from']) ? $_GET['from'] : 'list';
+        $redirectAction = ($from === 'overdue') ? 'overdue-list' : 'borrow-list';
+        $this->redirect('admin.php?action=' . $redirectAction);
     }
 }

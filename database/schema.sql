@@ -187,3 +187,12 @@ UNION ALL
 SELECT 'Book_Items', COUNT(*) FROM Book_Items
 UNION ALL
 SELECT 'Loans', COUNT(*) FROM Loans;
+
+
+ALTER TABLE Loans 
+ADD COLUMN renewal_count INT DEFAULT 0 AFTER status;
+
+UPDATE Loans 
+SET due_date = DATE_ADD(due_date, INTERVAL 7 DAY), 
+    renewal_count = renewal_count + 1 
+WHERE loan_id = [ID] AND renewal_count < 2;

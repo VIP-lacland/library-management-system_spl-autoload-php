@@ -16,7 +16,7 @@ class AdminCategoryController extends Controller
             return;
         }
 
-        $data['categories'] = $this->categoryModel->getAllCategory();
+        $data['categories'] = $this->categoryModel->getAllCategories();
         $data['message'] = $this->getFlash('message');
         $data['message_type'] = $this->getFlash('message_type');
 

@@ -1,4 +1,10 @@
+
+
 <?php
+session_start();
+
+
+
 require_once '../app/config/config.php';
 require_once '../app/core/Controller.php';
 require_once '../app/core/Database.php';
@@ -11,49 +17,56 @@ require_once('../app/controllers/ProfileController.php');
 require_once('../app/controllers/CartController.php');
 
 
-// Get action from URL parameter, default to 'index' if not provided
+
+
+
+// Get action from URL parameter
 $action = isset($_GET['action']) ? $_GET['action'] : 'index';
 
-// Initialize user controllers
-$bookController = new BookController();
+// Initialize controllers
+$bookController    = new BookController();
 $accountController = new AccountController();
 $authController = new AuthController();
 $profileController = new ProfileController();
 $cartController = new CartController();
 
 
-// Route based on action parameter
+// Routing
 switch ($action) {
+
     case 'index':
     case '':
         $bookController->index();
         break;
-    case 'book-detail':
-        // select ID from query parameter
-        $id = isset($_GET['id']) ? intval($_GET['id']) : null;
 
-        if ($id === null || $id <= 0) {
+    case 'book-detail':
+        $id = isset($_GET['id']) ? intval($_GET['id']) : 0;
+        if ($id <= 0) {
             die('Invalid book ID');
         }
         $bookController->detail($id);
         break;
+
     case 'register':
         $accountController->register();
         break;
+
     case 'register/process':
         $accountController->registerProcess();
         break;
+
     case 'login':
-        // Check if POST request (login process) or GET request (login form)
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $authController->login();
         } else {
             $authController->loginForm();
         }
         break;
+
     case 'logout':
         $authController->logout();
         break;
+
     case 'change-password':
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $accountController->changePassword();
@@ -61,9 +74,11 @@ switch ($action) {
             $accountController->changePasswordForm();
         }
         break;
+
     case 'forgot-password':
         $authController->forgotPassword();
         break;
+
     case 'reset-password':
         $authController->resetPassword();
         break;
@@ -91,6 +106,7 @@ switch ($action) {
         $profileController->updateProfile();
         break;
     default:
+        // Nếu action không tồn tại → quay về trang chủ
         $bookController->index();
         break;
 }

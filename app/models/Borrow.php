@@ -51,9 +51,15 @@ class Borrow {
     // [3] Lấy thông tin một phiếu mượn theo ID
     // ─────────────────────────────────────────────
     public function getById($id) {
-        $stmt = $this->db->prepare("SELECT * FROM Loans WHERE loan_id = :id");
+        $sql = "SELECT l.*, u.name as user_name, u.email, b.title as book_title, b.book_id, bi.barcode 
+                FROM Loans l
+                JOIN Users u ON l.user_id = u.user_id
+                JOIN Book_Items bi ON l.book_items_id = bi.book_items_id
+                JOIN Books b ON bi.book_id = b.book_id
+                WHERE l.loan_id = :id";
+        $stmt = $this->db->prepare($sql);
         $stmt->execute(['id' => $id]);
-        return $stmt->fetch();
+        return $stmt->fetch(PDO::FETCH_ASSOC);
     }
 
     // ─────────────────────────────────────────────
@@ -61,14 +67,17 @@ class Borrow {
     //     Đồng thời đổi Book_Items -> borrowed
     // ─────────────────────────────────────────────
     public function approveRequest($loanId, $dueDate) {
+        $loan = $this->getById($loanId);
+        if (!$loan || $loan['status'] !== 'pending') {
+            return false;
+        }
+
         $stmt = $this->db->prepare(
-            "UPDATE Loans SET status = 'borrowing', due_date = :due_date WHERE loan_id = :id AND status = 'pending'"
+            "UPDATE Loans SET status = 'borrowing', due_date = :due_date, borrow_date = CURDATE() WHERE loan_id = :id AND status = 'pending'"
         );
         $res = $stmt->execute(['due_date' => $dueDate, 'id' => $loanId]);
         
-        // ✅ FIX: Kiểm tra rowCount để đảm bảo update thực sự xảy ra
         if ($res && $stmt->rowCount() > 0) {
-            $loan = $this->getById($loanId);
             $stmtItem = $this->db->prepare(
                 "UPDATE Book_Items SET status = 'borrowed' WHERE book_items_id = :item_id"
             );
@@ -83,7 +92,9 @@ class Borrow {
     // ─────────────────────────────────────────────
     public function rejectRequest($loanId) {
         $loan = $this->getById($loanId);
-        if (!$loan || $loan['status'] !== 'pending') return false;
+        if (!$loan || $loan['status'] !== 'pending') {
+            return false;
+        }
 
         $stmt = $this->db->prepare(
             "UPDATE Loans SET status = 'rejected' WHERE loan_id = :id AND status = 'pending'"
@@ -104,13 +115,17 @@ class Borrow {
     //     Đồng thời đổi Book_Items lại -> available
     // ─────────────────────────────────────────────
     public function returnBook($loanId) {
+        $loan = $this->getById($loanId);
+        if (!$loan || $loan['status'] !== 'borrowing') {
+            return false;
+        }
+
         $stmt = $this->db->prepare(
             "UPDATE Loans SET status = 'returned', return_date = CURDATE() WHERE loan_id = :id AND status = 'borrowing'"
         );
         $res = $stmt->execute(['id' => $loanId]);
         
         if ($res && $stmt->rowCount() > 0) {
-            $loan = $this->getById($loanId);
             $stmtItem = $this->db->prepare(
                 "UPDATE Book_Items SET status = 'available' WHERE book_items_id = :item_id"
             );
@@ -317,5 +332,34 @@ class Borrow {
         
         $stmt->execute();
         return $stmt->fetchAll();
+    }    // ─────────────────────────────────────────────
+    // [17] Gia hạn sách: Cập nhật ngày trả và đếm số lần
+    // ─────────────────────────────────────────────
+    public function updateRenewal($loanId, $newDueDate) {
+        $sql = "UPDATE Loans 
+                SET due_date = :new_due_date, renewal_count = renewal_count + 1
+                WHERE loan_id = :loan_id";
+        $stmt = $this->db->prepare($sql);
+        $result = $stmt->execute([
+            'new_due_date' => $newDueDate,
+            'loan_id' => $loanId
+        ]);
+        return $result && $stmt->rowCount() > 0;
+    }
+
+    // ─────────────────────────────────────────────
+    // [18] Kiểm tra sách có đang được ai khác đặt trước không
+    // ─────────────────────────────────────────────
+    public function isBookReserved($bookId) {
+        // A book is considered "reserved" if there's at least one 'pending' loan request for it.
+        $sql = "SELECT COUNT(l.loan_id) as total
+                FROM Loans l
+                JOIN Book_Items bi ON l.book_items_id = bi.book_items_id
+                WHERE bi.book_id = :book_id AND l.status = 'pending'";
+        
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute(['book_id' => $bookId]);
+        $row = $stmt->fetch(PDO::FETCH_ASSOC);
+        return $row && $row['total'] > 0;
     }
 }
