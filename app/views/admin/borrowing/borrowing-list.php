@@ -12,7 +12,10 @@
 <body>
     <div class="d-flex" id="wrapper">
         <?php require_once __DIR__ . '/../components/sidebar.php'; ?>
+<<<<<<< HEAD
         
+=======
+>>>>>>> feature/profile
         <div id="page-content-wrapper">
             <nav class="navbar navbar-expand-lg navbar-light bg-light border-bottom">
                 <div class="container-fluid">
@@ -28,9 +31,17 @@
                 <form action="admin.php" method="GET" class="row g-2 mb-4">
                     <input type="hidden" name="action" value="borrow-list">
                     <div class="col-md-8">
-                        <input type="text" name="keyword" class="form-control" placeholder="Search by user, email, book title or barcode..." value="<?= htmlspecialchars($keyword) ?>">
+                        <input type="text" name="keyword" class="form-control"
+                            placeholder="Search by user, email, book title or barcode..."
+                            value="<?= htmlspecialchars($keyword) ?>">
                     </div>
+<<<<<<< HEAD
                     <div class="col-md-4"><button type="submit" class="btn btn-primary"><i class="fas fa-search"></i> Search</button> <?php if (!empty($keyword)): ?><a href="admin.php?action=borrow-list" class="btn btn-secondary ms-1">Reset</a><?php endif; ?></div>
+=======
+                    <div class="col-md-4"><button type="submit" class="btn btn-primary"><i class="fas fa-search"></i>
+                            Search</button> <?php if (!empty($keyword)): ?><a href="admin.php?action=borrow-list"
+                                class="btn btn-secondary ms-1">Reset</a><?php endif; ?></div>
+>>>>>>> feature/profile
                 </form>
 
                 <div class="d-flex justify-content-between align-items-center mb-3">
@@ -41,12 +52,23 @@
                     </div>
                 </div>
                 <?php if (isset($_SESSION['flash']['success'])): ?>
+<<<<<<< HEAD
                     <div class="alert alert-success alert-dismissible fade show"><?= $_SESSION['flash']['success'];
                                                                                     unset($_SESSION['flash']['success']); ?></div>
                 <?php endif; ?>
                 <?php if (isset($_SESSION['flash']['error'])): ?>
                     <div class="alert alert-danger alert-dismissible fade show"><?= $_SESSION['flash']['error'];
                                                                                 unset($_SESSION['flash']['error']); ?></div>
+=======
+                    <div class="alert alert-success alert-dismissible fade show">
+                        <?= $_SESSION['flash']['success'];
+                        unset($_SESSION['flash']['success']); ?></div>
+                <?php endif; ?>
+                <?php if (isset($_SESSION['flash']['error'])): ?>
+                    <div class="alert alert-danger alert-dismissible fade show">
+                        <?= $_SESSION['flash']['error'];
+                        unset($_SESSION['flash']['error']); ?></div>
+>>>>>>> feature/profile
                 <?php endif; ?>
                 <div class="card shadow-sm">
                     <div class="card-body">

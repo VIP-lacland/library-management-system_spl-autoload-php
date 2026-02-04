@@ -57,6 +57,24 @@ class User
         return $stmt->fetch(PDO::FETCH_ASSOC);
     }
 
+    public function updateProfile(int $userId, array $data): bool
+    {
+        $sql = "UPDATE Users 
+                SET name = :name, 
+                    phone = :phone, 
+                    address = :address 
+                WHERE user_id = :user_id";
+
+        $stmt = $this->db->prepare($sql);
+
+        return $stmt->execute([
+            ':name'     => $data['name'],
+            ':phone'    => $data['phone'],
+            ':address'  => $data['address'],
+            ':user_id'  => $userId
+        ]);
+    }
+
     public function getUserByEmail(string $email): ?object
     {
         $stmt = $this->db->prepare(

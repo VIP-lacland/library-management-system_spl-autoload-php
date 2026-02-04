@@ -103,7 +103,7 @@ if (!defined('BASE_URL')) {
                             <i class="fa-solid fa-chevron-down dropdown-arrow"></i>
                         </a>
                         <div class="dropdown-content">
-                            <a href="<?= url('index.php?action=index') ?>"><i class="fa-solid fa-user"></i> My Profile</a>
+                            <a href="<?= url('index.php?action=profile') ?>"><i class="fa-solid fa-user"></i> My Profile</a>
                             <a href="<?= url('index.php?action=my-loans') ?>"><i class="fa-solid fa-hand-holding-heart"></i> My Borrowed Books</a>
                             <a href="<?= url('index.php?action=change-password') ?>"><i class="fa-solid fa-key"></i> Change Password</a>
                         </div>

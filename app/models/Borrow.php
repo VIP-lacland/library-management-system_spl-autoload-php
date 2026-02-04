@@ -286,4 +286,36 @@ class Borrow {
         // Ngày trả phải >= hôm nay VÀ <= hôm nay + 21 ngày
         return ($date >= $today && $date <= $maxDate);
     }
+
+    // ─────────────────────────────────────────────
+    // [15] Đếm tổng số sách mượn của một user
+    // ─────────────────────────────────────────────
+    public function countLoansByUserId($userId) {
+        $sql = "SELECT COUNT(*) as total FROM Loans WHERE user_id = :user_id";
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute(['user_id' => $userId]);
+        $row = $stmt->fetch();
+        return $row ? (int)$row['total'] : 0;
+    }
+
+    // ─────────────────────────────────────────────
+    // [16] Lấy lịch sử mượn của một User (phân trang)
+    // ─────────────────────────────────────────────
+    public function getLoansByUserIdPaginated($userId, $limit, $offset) {
+        $sql = "SELECT l.*, b.title, b.author, bi.barcode, b.url 
+                FROM Loans l
+                JOIN Book_Items bi ON l.book_items_id = bi.book_items_id
+                JOIN Books b ON bi.book_id = b.book_id
+                WHERE l.user_id = :user_id
+                ORDER BY l.borrow_date DESC
+                LIMIT :limit OFFSET :offset";
+        
+        $stmt = $this->db->prepare($sql);
+        $stmt->bindValue(':user_id', $userId);
+        $stmt->bindValue(':limit', (int)$limit, PDO::PARAM_INT);
+        $stmt->bindValue(':offset', (int)$offset, PDO::PARAM_INT);
+        
+        $stmt->execute();
+        return $stmt->fetchAll();
+    }
 }

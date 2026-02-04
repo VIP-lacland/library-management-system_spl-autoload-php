@@ -7,7 +7,7 @@ require_once '../app/core/Database.php';
 require_once('../app/controllers/BookController.php');
 require_once('../app/controllers/AccountController.php');
 require_once('../app/controllers/AuthController.php');
-require_once('../app/controllers/CartController.php');
+require_once('../app/controllers/ProfileController.php');
 
 
 // Get action from URL parameter, default to 'index' if not provided
@@ -17,7 +17,7 @@ $action = isset($_GET['action']) ? $_GET['action'] : 'index';
 $bookController = new BookController();
 $accountController = new AccountController();
 $authController = new AuthController();
-$cartController = new CartController();
+$profileController = new ProfileController();
 
 
 // Route based on action parameter
@@ -82,6 +82,11 @@ switch ($action) {
         break;
     case 'cart-checkout':
         $cartController->checkout();
+    case 'profile':
+        $profileController->showProfile();
+        break;
+    case 'update-profile':
+        $profileController->updateProfile();
         break;
     default:
         $bookController->index();
