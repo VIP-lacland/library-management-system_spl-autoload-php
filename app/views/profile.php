@@ -20,13 +20,27 @@
     .page-link {
         color: #667eea;
     }
+    
+    /* CSS để căn giữa form */
+    .profile-wrapper {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: calc(100vh - 200px);
+        padding: 40px 0;
+    }
+    
+    .profile-card-container {
+        width: 100%;
+        max-width: 600px;
+    }
 </style>
 
 <div class="container mt-5 mb-5">
-    <div class="row g-5">
-        <!-- User Profile Section (Left) -->
-        <div class="col-lg-5">
-            <div class="card shadow-sm h-100 rounded-lg">
+    <div class="profile-wrapper">
+        <div class="profile-card-container">
+            <!-- User Profile Section -->
+            <div class="card shadow-sm rounded-lg">
                 <div class="card-header bg-primary text-white">
                     <h4 class="mb-0"><i class="fa-solid fa-user-pen me-2"></i>Hồ sơ của tôi</h4>
                 </div>
@@ -75,73 +89,6 @@
                     </form>
                     <?php else: ?>
                         <p class="text-center">Không thể tải thông tin người dùng.</p>
-                    <?php endif; ?>
-                </div>
-            </div>
-        </div>
-
-        <!-- Loan History Section (Right) -->
-        <div class="col-lg-7">
-            <div class="card shadow-sm h-100 rounded-4">
-                <div class="card-header bg-primary text-white">
-                    <h4 class="mb-0"><i class="fa-solid fa-history me-2"></i>Lịch sử mượn sách</h4>
-                </div>
-                <div class="card-body">
-                    <div class="table-responsive rounded-3">
-                        <table class="table table-hover align-middle">
-                            <thead class="table-light">
-                                <tr>
-                                    <th>Tên sách</th>
-                                    <th>Ngày mượn</th>
-                                    <th>Hạn trả</th>
-                                    <th>Ngày trả</th>
-                                    <th>Trạng thái</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <?php if (isset($loans) && !empty($loans)): ?>
-                                    <?php foreach ($loans as $loan): ?>
-                                        <tr>
-                                            <td><?= htmlspecialchars($loan['book_title'] ?? 'N/A') ?></td>
-                                            <td><?= date('d/m/Y', strtotime($loan['borrow_date'])) ?></td>
-                                            <td><?= $loan['due_date'] ? date('d/m/Y', strtotime($loan['due_date'])) : '-' ?></td>
-                                            <td><?= $loan['return_date'] ? date('d/m/Y', strtotime($loan['return_date'])) : '-' ?></td>
-                                            <td>
-                                                <?php
-                                                $statusClass = 'secondary';
-                                                $statusText = ucfirst($loan['status']);
-                                                switch ($loan['status']) {
-                                                    case 'borrowing': $statusClass = 'primary'; break;
-                                                    case 'returned': $statusClass = 'success'; break;
-                                                    case 'overdue': $statusClass = 'danger'; break;
-                                                    case 'pending': $statusClass = 'warning text-dark'; break;
-                                                    case 'rejected': $statusClass = 'secondary'; break;
-                                                }
-                                                ?>
-                                                <span class="badge bg-<?= $statusClass ?>"><?= $statusText ?></span>
-                                            </td>
-                                        </tr>
-                                    <?php endforeach; ?>
-                                <?php else: ?>
-                                    <tr>
-                                        <td colspan="5" class="text-center py-4">Bạn chưa mượn cuốn sách nào.</td>
-                                    </tr>
-                                <?php endif; ?>
-                            </tbody>
-                        </table>
-                    </div>
-
-                    <!-- Pagination -->
-                    <?php if (isset($totalPages) && $totalPages > 1): ?>
-                        <nav aria-label="Page navigation" class="mt-4">
-                            <ul class="pagination justify-content-center">
-                                <li class="page-item <?= ($currentPage <= 1) ? 'disabled' : '' ?>"><a class="page-link" href="index.php?action=profile&page=<?= $currentPage - 1 ?>">Previous</a></li>
-                                <?php for ($i = 1; $i <= $totalPages; $i++): ?>
-                                    <li class="page-item <?= ($i == $currentPage) ? 'active' : '' ?>"><a class="page-link" href="index.php?action=profile&page=<?= $i ?>"><?= $i ?></a></li>
-                                <?php endfor; ?>
-                                <li class="page-item <?= ($currentPage >= $totalPages) ? 'disabled' : '' ?>"><a class="page-link" href="index.php?action=profile&page=<?= $currentPage + 1 ?>">Next</a></li>
-                            </ul>
-                        </nav>
                     <?php endif; ?>
                 </div>
             </div>

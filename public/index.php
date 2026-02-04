@@ -8,6 +8,7 @@ require_once('../app/controllers/BookController.php');
 require_once('../app/controllers/AccountController.php');
 require_once('../app/controllers/AuthController.php');
 require_once('../app/controllers/ProfileController.php');
+require_once('../app/controllers/CartController.php');
 
 
 // Get action from URL parameter, default to 'index' if not provided
@@ -18,6 +19,7 @@ $bookController = new BookController();
 $accountController = new AccountController();
 $authController = new AuthController();
 $profileController = new ProfileController();
+$cartController = new CartController();
 
 
 // Route based on action parameter

@@ -1,6 +1,19 @@
 <?php require_once __DIR__ . '/../layouts/header.php'; ?>
 
-<div class="container mt-5">
+<style>
+    /* Thêm khoảng cách giữa nội dung và footer */
+    .borrowed-books-container {
+        min-height: calc(100vh - 250px);
+        padding-bottom: 60px;
+    }
+    
+    /* Custom spacing cho card */
+    .borrowed-books-card {
+        margin-bottom: 40px;
+    }
+</style>
+
+<div class="container mt-5 borrowed-books-container">
     <h2 class="mb-4"><i class="fa-solid fa-hand-holding-heart"></i> My Borrowed Books</h2>
 
     <?php if (isset($_SESSION['flash'])): ?>
@@ -15,7 +28,7 @@
         <?php endif; ?>
     <?php endif; ?>
 
-    <div class="card shadow-sm">
+    <div class="card shadow-sm borrowed-books-card">
         <div class="card-body">
             <?php if (!empty($loans)): ?>
                 <div class="table-responsive">

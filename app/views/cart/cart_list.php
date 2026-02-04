@@ -1,6 +1,19 @@
 <?php require_once __DIR__ . '/../layouts/header.php'; ?>
 
-<div class="container mt-5">
+<style>
+    /* Thêm khoảng cách giữa nội dung và footer */
+    .cart-container {
+        min-height: calc(100vh - 250px);
+        padding-bottom: 60px;
+    }
+    
+    /* Custom spacing cho card */
+    .cart-card {
+        margin-bottom: 40px;
+    }
+</style>
+
+<div class="container mt-5 cart-container">
     <h2 class="mb-4"><i class="fas fa-shopping-cart"></i> Cart List</h2>
 
     <!-- ✅ FIX: Flash messages - xử lý success và error riêng lẻ, clean hơn -->
@@ -21,7 +34,7 @@
     <?php endif; ?>
 
     <?php if (!empty($books)): ?>
-        <div class="card shadow-sm">
+        <div class="card shadow-sm cart-card">
             <div class="card-body">
                 <!-- Book count badge -->
                 <div class="d-flex justify-content-between align-items-center mb-3">
@@ -86,7 +99,7 @@
         </div>
     <?php else: ?>
         <!-- Empty cart state -->
-        <div class="alert alert-info text-center py-5 border-0 shadow-sm">
+        <div class="alert alert-info text-center py-5 border-0 shadow-sm cart-card">
             <i class="fas fa-shopping-cart fa-3x text-info mb-3"></i>
             <h4>Your cart is empty</h4>
             <p class="text-muted mb-4">Browse our library and find some books to read!</p>
