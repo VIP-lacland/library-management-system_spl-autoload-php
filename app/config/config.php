@@ -6,7 +6,7 @@
 // Database
 define('DB_HOST', 'localhost');
 define('DB_USER', 'root');
-define('DB_PASS', '');
+define('DB_PASS', 'Beng1936@');
 define('DB_NAME', 'library_management');
 
 // App Info

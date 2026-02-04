@@ -1,11 +1,11 @@
 <?php
-// public/admin.php
+session_start();
+
 require_once '../app/config/config.php';
 require_once '../app/core/Controller.php';
 require_once '../app/core/Database.php';
 
-
-if ($_SESSION['user']['role'] !== 'admin') {
+if (!isset($_SESSION['user']) || $_SESSION['user']['role'] !== 'admin') {
     $_SESSION['flash']['error'] = 'Bạn không có quyền truy cập.';
     header('Location: index.php?action=login');
     exit;
@@ -23,14 +23,15 @@ $action = isset($_GET['action']) ? $_GET['action'] : 'dashboard';
 
 // Initialize controllers
 $dashboardController = new DashboardController();
-// $bookController = new AdminBookController();
-// $userController = new AdminUserController();
-// $categoryController = new AdminCategoryController();
-// $borrowingController = new AdminBorrowingController();
+$categoryController  = new CategoryController();
 
 // Admin routing
 switch ($action) {
     case 'dashboard':
         $dashboardController->index();
         break;
-    }
+
+    case 'categories':
+        $categoryController->index();
+        break;
+}
