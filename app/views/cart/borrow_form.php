@@ -21,7 +21,6 @@
                         <?php unset($_SESSION['flash']['error']); ?>
                     <?php endif; ?>
 
-                    <!-- ✅ Preview: Danh sách sách trong cart -->
                     <?php if (!empty($books)): ?>
                     <div class="mb-4">
                         <h6 class="text-muted text-uppercase fw-semibold mb-2" style="font-size: 0.75rem; letter-spacing: 0.05em;">
