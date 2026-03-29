@@ -14,7 +14,7 @@ class AdminBookController extends Controller
     public function adminBookList()
     {
         if ($this->isPost()) {
-            $this->redirect(url('admin.php?action=book-management'));
+            $this->redirect(url('admin.php?url=book/adminBookList'));
             return;
         }
 
@@ -51,7 +51,7 @@ class AdminBookController extends Controller
         if (!$this->isPost()) {
             $this->view('admin/books/add-book', [
                 'title' => 'Add New Book',
-                'categories' => $this->categoryModel->getAllCategory(),
+                'categories' => $this->categoryModel->getAllCategories(),
                 'message' => $this->getFlash('message'),
                 'message_type' => $this->getFlash('message_type')
             ]);
@@ -60,14 +60,14 @@ class AdminBookController extends Controller
 
         $bookData = $this->getBookDataFromPost();
         if (empty($bookData['title']) || empty($bookData['author'])) {
-            $this->redirectWithError('Please fill in all required information', 'admin.php?action=add-book');
+            $this->redirectWithError('Please fill in all required information', 'admin.php?url=book/addBook'); // ✅
             return;
         }
 
         if ($this->bookModel->addBook($bookData)) {
             $this->redirectWithSuccess('Book "' . htmlspecialchars($bookData['title']) . '" added successfully');
         } else {
-            $this->redirectWithError('Unable to add book', 'admin.php?action=add-book');
+            $this->redirectWithError('Unable to add book', 'admin.php?url=book/addBook');
         }
     }
 
@@ -90,7 +90,7 @@ class AdminBookController extends Controller
                 'book' => $book,
                 'book_id' => $bookId,
                 'bookData' => $book,
-                'categories' => $this->categoryModel->getAllCategory(),
+                'categories' => $this->categoryModel->getAllCategories(),
                 'title' => 'Edit Book: ' . $book['title'],
                 'message' => $this->getFlash('message'),
                 'message_type' => $this->getFlash('message_type')
@@ -100,21 +100,21 @@ class AdminBookController extends Controller
 
         $bookData = $this->getBookDataFromPost();
         if (empty($bookData['title']) || empty($bookData['author'])) {
-            $this->redirectWithError('Please fill in all required information', 'admin.php?action=edit-book&id=' . $bookId);
+            $this->redirectWithError('Please fill in all required information', 'admin.php?url=book/editBook&id=' . $bookId);
             return;
         }
 
         if ($this->bookModel->updateBook($bookId, $bookData)) {
-            $this->redirectWithSuccess('Book "' . htmlspecialchars($bookData['title']) . '" updated successfully');
+            $this->redirectWithSuccess('Book updated successfully');
         } else {
-            $this->redirectWithError('Unable to update book', 'admin.php?action=edit-book&id=' . $bookId);
+            $this->redirectWithError('Unable to update book', 'admin.php?url=book/editBook&id=' . $bookId);
         }
     }
 
     public function deleteBook()
     {
         if (!$this->isPost()) {
-            $this->redirect(url('admin.php?action=book-management'));
+            $this->redirect(url('admin.php?url=book/adminBookList'));
             return;
         }
 
@@ -150,14 +150,14 @@ class AdminBookController extends Controller
         ];
     }
 
-    private function redirectWithError($message, $url = 'admin.php?action=book-management')
+    private function redirectWithError($message, $url = 'admin.php?url=book/adminBookList')
     {
         $this->setFlash('message', $message);
         $this->setFlash('message_type', 'error');
         $this->redirect(url($url));
     }
 
-    private function redirectWithSuccess($message, $url = 'admin.php?action=book-management')
+    private function redirectWithSuccess($message, $url = 'admin.php?url=book/adminBookList')
     {
         $this->setFlash('message', $message);
         $this->setFlash('message_type', 'success');

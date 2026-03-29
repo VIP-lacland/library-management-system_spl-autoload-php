@@ -1,6 +1,6 @@
 <?php
 
-class BorrowingController extends Controller
+class AdminBorrowingController extends Controller
 {
     private $borrowModel;
 
@@ -10,16 +10,16 @@ class BorrowingController extends Controller
         if (!isset($_SESSION['user']) || $_SESSION['user']['role'] !== 'admin') {
             $this->setFlash('error', 'Access Denied: You do not have permission to access this page.');
             if (!isset($_SESSION['user'])) {
-                $this->redirect('index.php?action=login');
+                $this->redirect(url('index.php?url=auth/loginForm'));
             } else {
-                $this->redirect('index.php');
+                $this->redirect(url('index.php?url=book/index'));
             }
             exit;
         }
         $this->borrowModel = $this->model('Borrow');
     }
 
-    public function listBorrowings()
+    public function listBorrowing()
     {
         $keyword = isset($_GET['keyword']) ? trim($_GET['keyword']) : '';
         $page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
@@ -75,7 +75,7 @@ class BorrowingController extends Controller
                 $this->setFlash('error', 'Failed to approve request. It may have been processed already.');
             }
         }
-        $this->redirect('admin.php?action=borrow-requests');
+        $this->redirect(url('admin.php?url=borrowing/requests'));
     }
 
     public function reject()
@@ -88,7 +88,7 @@ class BorrowingController extends Controller
                 $this->setFlash('error', 'Failed to reject request. It may have been processed already.');
             }
         }
-        $this->redirect('admin.php?action=borrow-requests');
+        $this->redirect(url('admin.php?url=borrowing/requests'));
     }
 
     public function returnBook()
@@ -104,7 +104,7 @@ class BorrowingController extends Controller
 
         // Redirect back to the page the admin came from
         $from = isset($_GET['from']) ? $_GET['from'] : 'list';
-        $redirectAction = ($from === 'overdue') ? 'overdue-list' : 'borrow-list';
-        $this->redirect('admin.php?action=' . $redirectAction);
+        $redirectUrl = ($from === 'overdue') ? 'borrowing/overdue' : 'borrowing/listBorrowing';
+        $this->redirect(url('admin.php?url=' . $redirectUrl));
     }
 }

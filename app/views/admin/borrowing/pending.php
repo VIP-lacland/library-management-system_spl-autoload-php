@@ -23,20 +23,15 @@
                     <h2><i class="fas fa-clipboard-list me-2"></i>Borrow Requests</h2>
                 </div>
                 <div class="mb-3">
-                    <a href="admin.php?action=borrow-list" class="btn btn-outline-primary">All History</a>
-                    <a href="admin.php?action=borrow-requests" class="btn btn-warning active text-dark">Pending
-                        Requests</a>
-                    <a href="admin.php?action=borrow-overdue" class="btn btn-outline-danger">Overdue Books</a>
+                    <a href="admin.php?url=borrowing/listBorrowing" class="btn btn-outline-primary">All History</a>
+                    <a href="admin.php?url=borrowing/requests" class="btn btn-warning active text-dark">Pending Requests</a>
+                    <a href="admin.php?url=borrowing/overdue" class="btn btn-outline-danger">Overdue Books</a>
                 </div>
-                <?php if (isset($_SESSION['flash']['success'])): ?>
-                    <div class="alert alert-success alert-dismissible fade show">
-                        <?= $_SESSION['flash']['success'];
-                        unset($_SESSION['flash']['success']); ?></div>
+                <?php if (!empty($success)): ?>
+                    <div class="alert alert-success"><?= htmlspecialchars($success) ?></div>
                 <?php endif; ?>
-                <?php if (isset($_SESSION['flash']['error'])): ?>
-                    <div class="alert alert-danger alert-dismissible fade show">
-                        <?= $_SESSION['flash']['error'];
-                        unset($_SESSION['flash']['error']); ?></div>
+                <?php if (!empty($error)): ?>
+                    <div class="alert alert-danger"><?= htmlspecialchars($error) ?></div>
                 <?php endif; ?>
                 <div class="card shadow-sm border-warning">
                     <div class="card-header bg-warning text-dark">
@@ -71,14 +66,6 @@
                                                 <td><?= date('d/m/Y', strtotime($req['borrow_date'])) ?></td>
                                                 <td>
                                                     <div class="btn-group" role="group">
-                                                        <a href="admin.php?action=borrow-approve&id=<?= $req['loan_id'] ?>"
-                                                            class="btn btn-success btn-sm"
-                                                            onclick="return confirm('Approve this request?')"><i
-                                                                class="fas fa-check"></i> Approve</a>
-                                                        <a href="admin.php?action=borrow-reject&id=<?= $req['loan_id'] ?>"
-                                                            class="btn btn-danger btn-sm"
-                                                            onclick="return confirm('Reject this request?')"><i
-                                                                class="fas fa-times"></i> Reject</a>
                                                     </div>
                                                 </td>
                                             </tr>

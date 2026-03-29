@@ -15,8 +15,7 @@
 
 <div class="container mt-5 cart-container">
     <h2 class="mb-4"><i class="fas fa-shopping-cart"></i> Cart List</h2>
-
-    <!-- ✅ FIX: Flash messages - xử lý success và error riêng lẻ, clean hơn -->
+    
     <?php if (isset($_SESSION['flash']['success'])): ?>
         <div class="alert alert-success alert-dismissible fade show" role="alert">
             <?= htmlspecialchars($_SESSION['flash']['success']) ?>

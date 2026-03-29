@@ -14,23 +14,23 @@ if (!defined('BASE_URL')) {
     <div class="border-end bg-dark" id="sidebar-wrapper">
         <div class="sidebar-heading text-white"><i class="fas fa-book-reader me-2"></i>LMS Admin</div>
         <div class="list-group list-group-flush">
-            <a class="list-group-item list-group-item-action p-3 <?= $act === 'dashboard' ? 'active' : '' ?>" href="admin.php?action=dashboard">
+            <a class="list-group-item list-group-item-action p-3 <?= $act === 'dashboard' ? 'active' : '' ?>" href="admin.php?url=category/index">
                 <i class="fas fa-tachometer-alt me-2"></i> Dashboard
             </a>
-            <a class="list-group-item list-group-item-action p-3" href="admin.php?action=book-management">
+            <a class="list-group-item list-group-item-action p-3" href="admin.php?url=book/adminBookList">
                 <i class="fas fa-book me-2"></i> Book Management
             </a>
-            <a class="list-group-item list-group-item-action p-3" href="admin.php?action=category-list">
+            <a class="list-group-item list-group-item-action p-3" href="admin.php?url=category/categoryList">
                 <i class="fas fa-list me-2"></i> Category
             </a>
             <!-- Active nếu action bắt đầu bằng 'borrow' (borrow-list, borrow-requests,...) -->
-            <a class="list-group-item list-group-item-action p-3 <?= strpos($act, 'borrow') === 0 ? 'active' : '' ?>" href="admin.php?action=borrow-list">
+            <a class="list-group-item list-group-item-action p-3 <?= strpos($act, 'borrow') === 0 ? 'active' : '' ?>" href="admin.php?url=borrowing/listBorrowing">
                 <i class="fas fa-exchange-alt me-2"></i> Borrow & Return
             </a>
-            <a class="list-group-item list-group-item-action p-3" href="admin.php?action=users">
+            <a class="list-group-item list-group-item-action p-3" href="admin.php?url=user/getAllUser">
                 <i class="fas fa-users me-2"></i> User
             </a>
-            <a class="list-group-item list-group-item-action p-3 mt-4 border-top border-secondary" href="index.php?action=logout">
+            <a class="list-group-item list-group-item-action p-3 mt-4 border-top border-secondary" href="index.php?url=logout">
                 <i class="fas fa-sign-out-alt me-2"></i> Logout
             </a>
         </div>

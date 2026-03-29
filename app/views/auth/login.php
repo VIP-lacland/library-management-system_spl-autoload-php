@@ -27,17 +27,17 @@ if (!defined('BASE_URL')) {
             <?php unset($_SESSION['flash']['error']); ?>
         <?php endif; ?>
 
-        <form method="POST" action="<?= url('index.php?action=login') ?>">
+        <form method="POST" action="<?= url('?url=auth/login') ?>">
             <input type="email" name="email" placeholder="Email" required>
             <input type="password" name="password" placeholder="Password" required>
             <button type="submit">Login</button>
             <div class="auth-message">
                 <p>Don't have an account yet?</p>
-                <a href="<?= url('index.php?action=register') ?>">Register now</a>
+                <a href="<?= url('?url=account/register') ?>">Register now</a>
             </div>
         </form>
 
-        <a href="<?= url('index.php?action=forgot-password') ?>">Forgot Password?</a>
+        <a href="<?= url('index.php?url=auth/forgotPasswordForm') ?>">Forgot Password?</a>
 
 
 

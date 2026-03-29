@@ -6,6 +6,7 @@ if (!defined('BASE_URL')) {
 ?>
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -15,9 +16,10 @@ if (!defined('BASE_URL')) {
     <link rel="stylesheet" href="<?= asset('css/admin.css') ?>">
     <title><?= $title ?? 'Edit Book' ?></title>
 </head>
+
 <body>
     <div class="d-flex" id="wrapper">
-        <?php require_once __DIR__ . '../../components/sidebar.php'; ?>
+        <?php require_once __DIR__ . '/../components/sidebar.php'; ?>
 
         <div id="page-content-wrapper">
             <nav class="navbar navbar-expand-lg navbar-light bg-light border-bottom">
@@ -27,7 +29,7 @@ if (!defined('BASE_URL')) {
                     </button>
                 </div>
             </nav>
-            
+
             <div class="container-fluid px-4 py-4">
                 <?php if (isset($message) && $message): ?>
                     <div class="alert alert-<?= $message_type === 'error' ? 'danger' : 'success' ?>">
@@ -40,24 +42,24 @@ if (!defined('BASE_URL')) {
                         <i class="fas fa-edit me-2"></i>
                         <?= $title ?? 'Edit Book' ?>
                     </h2>
-                    
+
                     <!-- Form action trỏ về edit-book để controller xử lý cập nhật -->
-                    <form method="POST" action="admin.php?action=edit-book&id=<?= $book_id ?>">
+                    <form method="POST" action="admin.php?url=book/editBook&id=<?= $book_id ?>">
                         <!-- Title -->
                         <div class="form-group">
                             <label class="form-label">Title *</label>
-                            <input type="text" name="title" class="form-control" 
-                                   value="<?= htmlspecialchars($bookData['title'] ?? '') ?>"
-                                   required maxlength="100">
+                            <input type="text" name="title" class="form-control"
+                                value="<?= htmlspecialchars($bookData['title'] ?? '') ?>"
+                                required maxlength="100">
                             <div class="form-text">Book title (max 100 characters)</div>
                         </div>
 
                         <!-- Author -->
                         <div class="form-group">
                             <label class="form-label">Author *</label>
-                            <input type="text" name="author" class="form-control" 
-                                   value="<?= htmlspecialchars($bookData['author'] ?? '') ?>"
-                                   required maxlength="100">
+                            <input type="text" name="author" class="form-control"
+                                value="<?= htmlspecialchars($bookData['author'] ?? '') ?>"
+                                required maxlength="100">
                             <div class="form-text">Author name (max 100 characters)</div>
                         </div>
 
@@ -65,15 +67,15 @@ if (!defined('BASE_URL')) {
                         <div class="row">
                             <div class="col-md-6 form-group">
                                 <label class="form-label">Publisher</label>
-                                <input type="text" name="publisher" class="form-control" 
-                                       value="<?= htmlspecialchars($bookData['publisher'] ?? '') ?>"
-                                       maxlength="100">
+                                <input type="text" name="publisher" class="form-control"
+                                    value="<?= htmlspecialchars($bookData['publisher'] ?? '') ?>"
+                                    maxlength="100">
                             </div>
                             <div class="col-md-6 form-group">
                                 <label class="form-label">Publish Year</label>
-                                <input type="number" name="publish_year" class="form-control" 
-                                       value="<?= htmlspecialchars($bookData['publish_year'] ?? '') ?>"
-                                       min="1000" max="<?= date('Y') ?>">
+                                <input type="number" name="publish_year" class="form-control"
+                                    value="<?= htmlspecialchars($bookData['publish_year'] ?? '') ?>"
+                                    min="1000" max="<?= date('Y') ?>">
                             </div>
                         </div>
 
@@ -81,22 +83,22 @@ if (!defined('BASE_URL')) {
                         <div class="form-group">
                             <label class="form-label">Description</label>
                             <textarea name="description" class="form-control" rows="4"
-                                      maxlength="65535"><?= htmlspecialchars($bookData['description'] ?? '') ?></textarea>
+                                maxlength="65535"><?= htmlspecialchars($bookData['description'] ?? '') ?></textarea>
                         </div>
 
                         <!-- Image URL -->
                         <div class="form-group">
                             <label class="form-label">Cover Image URL</label>
-                            <input type="text" name="url" class="form-control" 
-                                   value="<?= htmlspecialchars($bookData['url'] ?? '') ?>"
-                                   placeholder="https://example.com/image.jpg"
-                                   maxlength="250">
+                            <input type="text" name="url" class="form-control"
+                                value="<?= htmlspecialchars($bookData['url'] ?? '') ?>"
+                                placeholder="https://example.com/image.jpg"
+                                maxlength="250">
                             <div class="form-text">Optional image URL (max 250 characters)</div>
                             <div class="img-preview-container">
                                 <?php if (!empty($bookData['url'])): ?>
-                                    <img src="<?= htmlspecialchars($bookData['url']) ?>" 
-                                         class="img-preview active"
-                                         onerror="this.classList.remove('active')">
+                                    <img src="<?= htmlspecialchars($bookData['url']) ?>"
+                                        class="img-preview active"
+                                        onerror="this.classList.remove('active')">
                                 <?php else: ?>
                                     <img src="" class="img-preview">
                                 <?php endif; ?>
@@ -105,7 +107,7 @@ if (!defined('BASE_URL')) {
 
                         <!-- Form Actions -->
                         <div class="form-actions">
-                            <a href="admin.php?action=book-management" class="btn btn-secondary">
+                            <a href="admin.php?url=book/adminBookList" class="btn btn-secondary">
                                 <i class="fas fa-times"></i> Cancel
                             </a>
                             <button type="submit" class="btn btn-warning">
@@ -132,7 +134,7 @@ if (!defined('BASE_URL')) {
             // Image preview
             const urlInput = document.querySelector('input[name="url"]');
             const imgPreview = document.querySelector('.img-preview');
-            
+
             if (urlInput && imgPreview) {
                 urlInput.addEventListener('input', function() {
                     if (this.value && this.value.startsWith('http')) {
@@ -155,4 +157,5 @@ if (!defined('BASE_URL')) {
         });
     </script>
 </body>
+
 </html>

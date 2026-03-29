@@ -44,13 +44,14 @@ if (!defined('BASE_URL')) {
                             Hello, <?= htmlspecialchars($_SESSION['user']['name'] ?? '') ?>
                         </span>
                     <?php endif; ?>
-                    <a href="<?= url('index.php?action=logout') ?>" class="logout-btn">
+                    <a href="<?= url('index.php?url=auth/logout') ?>" class="logout-btn">
                         <i class="fa-solid fa-right-from-bracket"></i>
                         Logout
                     </a>
                 </div>
             <?php else: ?>
-                <a href="<?= url('index.php?action=login') ?>" class="login-btn">
+                <a href="<?= url('index.php?url=auth/loginForm') ?>" class="login-btn">
+                <!-- <a href="<?= url('index.php?action=login') ?>" class="login-btn"> -->
                     <i class="fa-solid fa-right-to-bracket"></i>
                     Login
                 </a>
@@ -66,21 +67,21 @@ if (!defined('BASE_URL')) {
                 
                 <ul class="nav-menu" id="navMenu">
                     <li class="nav-item">
-                        <a href="<?= url('index.php?action=index') ?>" class="nav-link">
+                        <a href="<?= url('index.php?url=book/index') ?>" class="nav-link">
                             <i class="fa-solid fa-house"></i>
                             Home
                         </a>
                     </li>
 
                     <li class="nav-item">
-                        <a href="<?= url('index.php?action=index') ?>" class="nav-link">
+                        <a href="<?= url('index.php?url=book/index') ?>" class="nav-link">
                             <i class="fa-solid fa-book"></i>
                             Books
                         </a>
                     </li>
 
                     <li class="nav-item">
-                        <a href="<?= url('index.php?action=cart-list') ?>" class="nav-link">
+                        <a href="<?= url('index.php?url=cart/index') ?>" class="nav-link">
                             <i class="fa-solid fa-cart-shopping"></i>
                             Cart
                             <?php if (isset($_SESSION['cart']) && count($_SESSION['cart']) > 0): ?>
@@ -90,7 +91,7 @@ if (!defined('BASE_URL')) {
                     </li>
 
                     <li class="nav-item">
-                        <a href="<?= url('index.php?action=index') ?>" class="nav-link">
+                        <a href="<?= url('index.php?url=book/index') ?>" class="nav-link">
                             <i class="fa-solid fa-tags"></i>
                             Categories
                         </a>
@@ -103,9 +104,9 @@ if (!defined('BASE_URL')) {
                             <i class="fa-solid fa-chevron-down dropdown-arrow"></i>
                         </a>
                         <div class="dropdown-content">
-                            <a href="<?= url('index.php?action=profile') ?>"><i class="fa-solid fa-user"></i> My Profile</a>
-                            <a href="<?= url('index.php?action=my-loans') ?>"><i class="fa-solid fa-hand-holding-heart"></i> My Borrowed Books</a>
-                            <a href="<?= url('index.php?action=change-password') ?>"><i class="fa-solid fa-key"></i> Change Password</a>
+                            <a href="<?= url('index.php?url=profile/showProfile') ?>"><i class="fa-solid fa-user"></i> My Profile</a>
+                            <a href="<?= url('index.php?url=account/myLoans') ?>"><i class="fa-solid fa-hand-holding-heart"></i> My Borrowed Books</a>
+                            <a href="<?= url('index.php?url=account/changePassword') ?>"><i class="fa-solid fa-key"></i> Change Password</a>
                         </div>
                     </li>
                 </ul>

@@ -79,7 +79,7 @@ require_once __DIR__ . '/../../config/config.php';
 
                     <div class="d-flex gap-2">
                         <!-- Form thêm vào giỏ -->
-                        <form action="<?= url('index.php?action=cart-add') ?>" method="POST">
+                        <form action="<?= url('index.php?url=cart/add') ?>" method="POST">
                             <input type="hidden" name="book_id" value="<?= $book['book_id'] ?>">
                             <button type="submit" class="btn btn-primary btn-lg">
                                 <i class="fas fa-cart-plus"></i> Add to Cart

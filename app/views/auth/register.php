@@ -43,7 +43,7 @@ if (!defined('BASE_URL')) {
           <div class="alert-container"></div>
         </div>
 
-        <form action="<?= url('index.php?action=register/process') ?>" method="POST">
+        <form action="<?= url('?url=account/registerProcess') ?>" method="POST">
 
           <!-- Họ tên -->
           <div class="mb-3 input_box">
@@ -78,7 +78,7 @@ if (!defined('BASE_URL')) {
 
         <!-- Link đăng nhập -->
         <div class="text-center mt-3">
-          <p>Already have an account? <a href="index.php?action=login">Log in now</a></p>
+          <p>Already have an account? <a href="?url=auth/loginForm">Log in now</a></p>
         </div>
       </div>
     </div>

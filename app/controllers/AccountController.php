@@ -4,9 +4,8 @@ class AccountController extends Controller
 {
     public function register()
     {
-        // nếu đăng nhập sẽ, chuyển về trang chủ
         if (isset($_SESSION['user'])) {
-            $this->redirect(url('index.php?action=index'));
+            $this->redirect(url('index.php?url=book/index'));
         }
         $this->view('auth/register');
     }
@@ -14,7 +13,7 @@ class AccountController extends Controller
     public function registerProcess()
     {
         if (!$this->isPost()) {
-            $this->redirect(url('index.php?action=register'));
+            $this->redirect(url('index.php?url=account/register'));
         }
 
         $username = $this->input('username');
@@ -51,7 +50,7 @@ class AccountController extends Controller
             $this->setFlash('errors', $errors);
             $this->setFlash('old_username', $username);
             $this->setFlash('old_email', $email);
-            $this->redirect(url('index.php?action=register'));  
+            $this->redirect(url('index.php?url=account/register'));  
             exit();
         }
 
@@ -62,16 +61,16 @@ class AccountController extends Controller
             $this->setFlash('errors', ['Email already exists']);
             $this->setFlash('old_username', $username);
             $this->setFlash('old_email', $email);
-            $this->redirect(url('index.php?action=register'));  
+            $this->redirect(url('index.php?url=account/register'));  
             exit();
         }
-
+        // code to create here!
         if ($user->create($username, $password, $email, $phone, $address)) {
             $this->setFlash('success', 'Registration successful');
-            $this->redirect(url('index.php?action=login')); 
+            $this->redirect(url('index.php?url=auth/loginForm')); 
         } else {
             $this->setFlash('errors', ['Registration failed, please try again']);
-            $this->redirect(url('index.php?action=register'));  
+            $this->redirect(url('index.php?url=account/register'));  
             exit();
         }
     }
@@ -81,7 +80,7 @@ class AccountController extends Controller
         // Require user to be logged in
         if (!$this->isLoggedIn()) {
             $this->setFlash('error', 'Please log in to use this feature');
-            $this->redirect(url('index.php?action=login'));
+            $this->redirect(url('index.php?auth/loginForm'));
             return;
         }
 
@@ -116,7 +115,7 @@ class AccountController extends Controller
 
         if (!empty($errors)) {
             $this->setFlash('errors', $errors);
-            $this->redirect(url('index.php?action=change-password'));
+            $this->redirect(url('index.php?url=url=account/changePasswordForm'));
             return;
         }
 
@@ -126,7 +125,7 @@ class AccountController extends Controller
 
         if (!$user || $current_password !== $user['password']) {
             $this->setFlash('errors', ['Current password is incorrect.']);
-            $this->redirect(url('index.php?action=change-password'));
+            $this->redirect(url('index.php?url=account/changePasswordForm'));
             return;
         }
 
@@ -134,10 +133,10 @@ class AccountController extends Controller
         if ($userModel->updatePassword($user_id, $new_password)) {
             $this->setFlash('success', 'Password changed successfully.');
             // Redirect to profile page or index
-            $this->redirect(url('index.php'));
+            $this->redirect(url('?url=book/index'));
         } else {
             $this->setFlash('errors', ['Something went wrong. Please try again']);
-            $this->redirect(url('index.php?action=change-password'));
+            $this->redirect(url('index.php?url=account/changePasswordForm'));
         }
     }
 

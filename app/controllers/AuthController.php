@@ -1,14 +1,13 @@
 <?php
-
 class AuthController extends Controller
 {
     public function loginForm()
     {
         if (isset($_SESSION['user'])) {
             if ($_SESSION['user']['role'] === 'admin') {
-                $this->redirect(url('index.php?action=admin/dashboard'));
+                $this->redirect(url('?url=dashboard/index'));
             } else {
-                $this->redirect(url('index.php?action=index'));
+                $this->redirect(url('index.php?url=book/index'));
             }
             exit;
         }
@@ -19,7 +18,7 @@ class AuthController extends Controller
     public function login()
     {
         if (!$this->isPost()) {
-            $this->redirect(url('index.php?action=login'));
+            $this->redirect(url('index.php?url=auth/login'));
             return;
         }
 
@@ -32,32 +31,30 @@ class AuthController extends Controller
         // Validate input
         if (!$user || $password !== $user['password']) {
             $this->setFlash('error', 'Invalid email or password');
-            $this->redirect(url('index.php?action=login'));
+            $this->redirect(url('index.php?url=auth/login'));
             exit;
         }
         
         if ($user['role'] == 'reader' && $user['status'] != 'active') {
             $this->setFlash('error', 'Your account is blocked');
-            $this->redirect(url('index.php?action=login'));
+            $this->redirect(url('index.php?url=auth/login'));
             exit;
         }
 
-        // ✅ FIX: Lưu đầy đủ thông tin user vào session
-        //    - Đổi 'username' -> 'name' để khớp với borrow_form view
-        //    - Thêm 'phone' field cho borrow_form hiển thị
         $_SESSION['user'] = [
             'id'        => $user['user_id'],
-            'name'      => $user['name'],          // ← đổi từ 'username'
+            'name'      => $user['name'],          
             'full_name' => $user['full_name'] ?? '',
             'email'     => $user['email'],
-            'phone'     => $user['phone'] ?? '',   // ← thêm phone
+            'phone'     => $user['phone'] ?? '',  
             'role'      => $user['role'] 
         ];
 
         if ($user['role'] === 'admin') {
-            $this->redirect(url('admin.php?action=dashboard'));
+            // $this->redirect(url('admin.php?url=dashboard/index'));
+            $this->view('admin/dashboard');
         } else {
-            $this->redirect(url('index.php?action=index'));
+            $this->redirect(url('?url=book/index'));
         }
         exit;
     }
@@ -65,7 +62,7 @@ class AuthController extends Controller
     public function logout()
     {
         session_destroy();
-        $this->redirect(url('index.php?action=index'));
+        $this->redirect(url('index.php?url=book/index'));
     }
 
     public function forgotPasswordForm()
@@ -96,7 +93,7 @@ class AuthController extends Controller
                     $expiresAt = date('Y-m-d H:i:s', strtotime('+1 hour'));
 
                     if ($userModel->createPasswordReset($user->user_id, $email, $token, $expiresAt)) {
-                        $resetLink = url('index.php?action=reset-password&token=' . $token);
+                        $resetLink = url('index.php?url=auth/resetPassword&token=' . $token);
 
                         $subject = 'Reset Password – Library Management System';
                         $body = "Hello " . $user->name . ",\n\n";
@@ -141,14 +138,13 @@ class AuthController extends Controller
             } elseif (empty($password)) {
                 $error = 'Please enter a new password.';
             } elseif (strlen($password) < 6) {
-                // ✅ FIX: Error message nói "8 characters" nhưng check < 6, đổi cho nhất quán
                 $error = 'Password must be at least 6 characters.';
             } elseif ($password !== $password_confirm) {
                 $error = 'Passwords do not match.';
             } else {
                 if ($userModel->updatePassword($user['user_id'], $password)) {
                     $this->setFlash('success', 'Password has been reset successfully. Please log in.');
-                    $this->redirect(url('index.php?action=login'));
+                    $this->redirect(url('index.php?url=auth/login'));
                     return;
                 } else {
                     $error = 'Something went wrong. Try again later.';

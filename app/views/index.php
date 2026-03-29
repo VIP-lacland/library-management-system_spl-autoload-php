@@ -46,7 +46,7 @@ if (!empty($keyword)) {
                         </div>
 
                         <div class="mt-auto">
-                            <a href="<?= url('index.php?action=book-detail&id=' . $book['book_id']) ?>" class="btn btn-primary w-100">View Details</a>
+                            <a href="<?= url('index.php?url=book/detail/' . $book['book_id']) ?>" class="btn btn-primary w-100">View Details</a>
                         </div>
                     </div>
                 </div>
@@ -61,7 +61,7 @@ if (!empty($keyword)) {
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
     
     <script>
-        // JS Toggle Menu giữ nguyên của bạn
+
         function toggleMenu() {
             const navMenu = document.getElementById('navMenu');
             navMenu.classList.toggle('active');

@@ -14,7 +14,7 @@ require_once __DIR__ . '../../../../config/config.php';
 </head>
 <body>
     <div class="d-flex" id="wrapper">
-        <?php require_once __DIR__ . '../../components/sidebar.php'; ?>
+        <?php require_once __DIR__ . '/../components/sidebar.php'; ?>
 
         <div id="page-content-wrapper">
             <nav class="navbar navbar-expand-lg navbar-light bg-light border-bottom">
@@ -38,7 +38,7 @@ require_once __DIR__ . '../../../../config/config.php';
                         <?= $title ?? 'Add New Book' ?>
                     </h2>
                     
-                    <form method="POST" action="admin.php?action=<?= isset($book_id) ? 'update-book&id=' . $book_id : 'add-book' ?>">
+                    <form method="POST" action="admin.php?url=<?= isset($book_id) ? 'book/editBook&id=' . $book_id : 'book/addBook' ?>">
                         <!-- Title -->
                         <div class="form-group">
                             <label class="form-label">Title *</label>
@@ -117,7 +117,7 @@ require_once __DIR__ . '../../../../config/config.php';
 
                         <!-- Form Actions -->
                         <div class="form-actions">
-                            <a href="admin.php?action=book-management" class="btn btn-secondary">
+                            <a href="admin.php?url=book/adminBookList" class="btn btn-secondary">
                                 <i class="fas fa-times"></i> Cancel
                             </a>
                             <button type="submit" class="btn btn-success">
