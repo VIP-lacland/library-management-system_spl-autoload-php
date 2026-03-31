@@ -37,6 +37,7 @@ if (!in_array($controller_name, $publicControllers) && !isset($_SESSION['user'])
     exit;
 }
 
+
 $baseClass = ucfirst($controller_name) . 'Controller';
 $controllerClass = $isAdmin ? 'Admin' . $baseClass : $baseClass;
 
