@@ -38,7 +38,7 @@ require_once __DIR__ . '../../../../config/config.php';
                         <?= $title ?? 'Add New Book' ?>
                     </h2>
                     
-                    <form method="POST" action="admin.php?url=<?= isset($book_id) ? 'book/editBook&id=' . $book_id : 'book/addBook' ?>">
+                    <form method="POST" action="index.php?url=<?= isset($book_id) ? 'book/editBook&id=' . $book_id : 'book/addBook' ?>">
                         <!-- Title -->
                         <div class="form-group">
                             <label class="form-label">Title *</label>
@@ -117,7 +117,7 @@ require_once __DIR__ . '../../../../config/config.php';
 
                         <!-- Form Actions -->
                         <div class="form-actions">
-                            <a href="admin.php?url=book/adminBookList" class="btn btn-secondary">
+                            <a href="index.php?url=book/adminBookList" class="btn btn-secondary">
                                 <i class="fas fa-times"></i> Cancel
                             </a>
                             <button type="submit" class="btn btn-success">

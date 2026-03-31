@@ -23,9 +23,9 @@
                     <h2 class="text-danger"><i class="fas fa-exclamation-triangle me-2"></i>Overdue Books</h2>
                 </div>
                 <div class="mb-3">
-                    <a href="admin.php?url=borrowing/listBorrowing" class="btn btn-outline-primary">All History</a>
-                    <a href="admin.php?url=borrowing/requests" class="btn btn-outline-warning">Pending Requests</a>
-                    <a href="admin.php?url=borrowing/overdue" class="btn btn-danger active">Overdue Books</a>
+                    <a href="index.php?url=borrowing/listBorrowing" class="btn btn-outline-primary">All History</a>
+                    <a href="index.php?url=borrowing/requests" class="btn btn-outline-warning">Pending Requests</a>
+                    <a href="index.php?url=borrowing/overdue" class="btn btn-danger active">Overdue Books</a>
                 </div>
                 <?php if (!empty($success)): ?>
                     <div class="alert alert-success"><?= htmlspecialchars($success) ?></div>
@@ -68,7 +68,7 @@
                                                 <td class="text-danger fw-bold"><?= date('d/m/Y', strtotime($loan['due_date'])) ?></td>
                                                 <td><span class="badge bg-danger"><i class="fas fa-exclamation-circle me-1"></i>Overdue</span></td>
                                                 <td>
-                                                    <a href="admin.php?url=borrowing/returnBook&id=<?= $loan['loan_id'] ?>&from=overdue?>" class="btn btn-primary btn-sm" onclick="return confirm('Mark this book as returned?')"><i class="fas fa-undo"></i> Mark Returned</a>
+                                                    <a href="index.php?url=borrowing/returnBook&id=<?= $loan['loan_id'] ?>&from=overdue?>" class="btn btn-primary btn-sm" onclick="return confirm('Mark this book as returned?')"><i class="fas fa-undo"></i> Mark Returned</a>
                                                 </td>
                                             </tr>
                                         <?php endforeach; ?>

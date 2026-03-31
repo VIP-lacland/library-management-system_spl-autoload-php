@@ -36,23 +36,23 @@
                     <!-- Search and Add -->
                     <div class="row mb-3">
                         <div class="col-md-6">
-                            <form method="GET" action="<?= url('admin.php') ?>" class="d-flex">
+                            <form method="GET" action="<?= url('index.php') ?>" class="d-flex">
                                <input type="hidden" name="url" value="book/adminBookList">
                                 <input type="text" name="keyword" class="form-control me-2" 
                                        placeholder="Search by title, author, publisher..." 
                                        value="<?= htmlspecialchars($data['keyword'] ?? '') ?>">
                                 <button type="submit" class="btn btn-outline-primary">Search</button>
                                 <?php if (!empty($keyword)): ?>
-                                    <a href="<?= url('admin.php?url=book/adminBookList') ?>" class="btn btn-outline-secondary ms-2">Clear</a>
+                                    <a href="<?= url('index.php?url=book/adminBookList') ?>" class="btn btn-outline-secondary ms-2">Clear</a>
                                 <?php endif; ?>
                             </form>
                         </div>
                         <div class="col-md-6 text-end">
                             <!-- NÚT IMPORT EXCEL -->
-                            <a href="<?= url('admin.php?url=importBook/importBooks') ?>" class="btn btn-info">
+                            <a href="<?= url('index.php?url=importBook/importBooks') ?>" class="btn btn-info">
                                 <i class="fas fa-file-import"></i> Import Excel
                             </a>
-                            <a href="<?= url('admin.php?url=book/addBook') ?>" class="btn btn-success">
+                            <a href="<?= url('index.php?url=book/addBook') ?>" class="btn btn-success">
                                 <i class="fas fa-plus"></i> Add New Book
                             </a>
                         </div>
@@ -76,7 +76,7 @@
                             <?php if (!empty($data['keyword'])): ?>
                                 No books found for "<?= htmlspecialchars($data['keyword']) ?>"
                             <?php else: ?>
-                                No books found. <a href="<?= url('admin.php?url=book/addBook') ?>">Add your first book</a>
+                                No books found. <a href="<?= url('index.php?url=book/addBook') ?>">Add your first book</a>
                             <?php endif; ?>
                         </div>
                     <?php else: ?>
@@ -106,11 +106,11 @@
                                         <td><?= htmlspecialchars($book['publisher'] ?? 'N/A') ?></td>
                                         <td><?= htmlspecialchars($book['publish_year'] ?? 'N/A') ?></td>
                                         <td>
-                                            <a href="<?= url('admin.php?url=book/editBook&id=' . $book['book_id']) ?>" 
+                                            <a href="<?= url('index.php?url=book/editBook&id=' . $book['book_id']) ?>" 
                                                class="btn btn-warning btn-sm" title="Edit">
                                                 <i class="fas fa-edit"></i>
                                             </a>
-                                            <form method="POST" action="<?= url('admin.php?url=book/deleteBook') ?>" 
+                                            <form method="POST" action="<?= url('index.php?url=book/deleteBook') ?>" 
                                                   class="d-inline" onsubmit="return confirm('Are you sure you want to delete this book?')">
                                                 <input type="hidden" name="book_id" value="<?= $book['book_id'] ?>">
                                                 <button type="submit" class="btn btn-danger btn-sm" title="Delete">
@@ -130,7 +130,7 @@
                                 <!-- Previous Button -->
                                 <li class="page-item <?= ($data['currentPage'] <= 1) ? 'disabled' : '' ?>">
                                     <a class="page-link" 
-                                       href="admin.php?url=book/adminBookList&page=<?= $currentPage - 1 ?><?= !empty($keyword) ? '&keyword=' . urlencode($keyword) : '' ?>">
+                                       href="index.php?url=book/adminBookList&page=<?= $currentPage - 1 ?><?= !empty($keyword) ? '&keyword=' . urlencode($keyword) : '' ?>">
                                         <i class="fas fa-chevron-left"></i> Previous
                                     </a>
                                 </li>
@@ -142,7 +142,7 @@
 
                                 if ($startPage > 1): ?>
                                     <li class="page-item">
-                                        <a class="page-link" href="admin.php?url=book/adminBookList&page=1<?= !empty($keyword) ? '&keyword=' . urlencode($keyword) : '' ?>">1</a>
+                                        <a class="page-link" href="index.php?url=book/adminBookList&page=1<?= !empty($keyword) ? '&keyword=' . urlencode($keyword) : '' ?>">1</a>
                                     </li>
                                     <?php if ($startPage > 2): ?>
                                         <li class="page-item disabled"><span class="page-link">...</span></li>
@@ -152,7 +152,7 @@
                                 <?php for ($i = $startPage; $i <= $endPage; $i++): ?>
                                     <li class="page-item <?= ($i == $data['currentPage']) ? 'active' : '' ?>">
                                         <a class="page-link" 
-                                           href="admin.php?url=book/adminBookList&page=<?= $i ?><?= !empty($keyword) ? '&keyword=' . urlencode($keyword) : '' ?>">
+                                           href="index.php?url=book/adminBookList&page=<?= $i ?><?= !empty($keyword) ? '&keyword=' . urlencode($keyword) : '' ?>">
                                             <?= $i ?>
                                         </a>
                                     </li>
@@ -164,7 +164,7 @@
                                     <?php endif; ?>
                                     <li class="page-item">
                                         <a class="page-link" 
-                                           href="admin.php?url=book/adminBookList&page=<?= $totalPages ?><?= !empty($keyword) ? '&keyword=' . urlencode($keyword) : '' ?>">
+                                           href="index.php?url=book/adminBookList&page=<?= $totalPages ?><?= !empty($keyword) ? '&keyword=' . urlencode($keyword) : '' ?>">
                                             <?= $totalPages ?>
                                         </a>
                                     </li>
@@ -173,7 +173,7 @@
                                 <!-- Next Button -->
                                 <li class="page-item <?= ($data['currentPage'] >= $data['totalPages']) ? 'disabled' : '' ?>">
                                     <a class="page-link" 
-                                       href="admin.php?url=book/adminBookList&page=<?= $currentPage + 1 ?><?= !empty($keyword) ? '&keyword=' . urlencode($keyword) : '' ?>">
+                                       href="index.php?url=book/adminBookList&page=<?= $currentPage + 1 ?><?= !empty($keyword) ? '&keyword=' . urlencode($keyword) : '' ?>">
                                         Next <i class="fas fa-chevron-right"></i>
                                     </a>
                                 </li>

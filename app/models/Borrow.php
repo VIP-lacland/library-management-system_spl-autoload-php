@@ -17,7 +17,6 @@ class Borrow {
                 JOIN Books b ON bi.book_id = b.book_id";
         
         if ($status) {
-            // ✅ FIX: Thêm ORDER BY khi filter theo status (trước đây thiếu)
             $sql .= " WHERE l.status = :status ORDER BY l.borrow_date DESC";
             $stmt = $this->db->prepare($sql);
             $stmt->execute(['status' => $status]);
@@ -47,9 +46,6 @@ class Borrow {
         return $stmt->fetchAll();
     }
 
-    // ─────────────────────────────────────────────
-    // [3] Lấy thông tin một phiếu mượn theo ID
-    // ─────────────────────────────────────────────
     public function getById($id) {
         $sql = "SELECT l.*, u.name as user_name, u.email, b.title as book_title, b.book_id, bi.barcode 
                 FROM Loans l
@@ -62,10 +58,6 @@ class Borrow {
         return $stmt->fetch(PDO::FETCH_ASSOC);
     }
 
-    // ─────────────────────────────────────────────
-    // [4] Duyệt yêu cầu mượn: pending -> borrowing
-    //     Đồng thời đổi Book_Items -> borrowed
-    // ─────────────────────────────────────────────
     public function approveRequest($loanId, $dueDate) {
         $loan = $this->getById($loanId);
         if (!$loan || $loan['status'] !== 'pending') {
@@ -86,10 +78,6 @@ class Borrow {
         return false;
     }
 
-    // ─────────────────────────────────────────────
-    // [5] Từ chối yêu cầu mượn: pending -> rejected
-    //     Đồng thời đổi Book_Items lại -> available
-    // ─────────────────────────────────────────────
     public function rejectRequest($loanId) {
         $loan = $this->getById($loanId);
         if (!$loan || $loan['status'] !== 'pending') {
@@ -110,10 +98,7 @@ class Borrow {
         return false;
     }
 
-    // ─────────────────────────────────────────────
-    // [6] Trả sách: borrowing -> returned
-    //     Đồng thời đổi Book_Items lại -> available
-    // ─────────────────────────────────────────────
+
     public function returnBook($loanId) {
         $loan = $this->getById($loanId);
         if (!$loan || $loan['status'] !== 'borrowing') {
@@ -134,9 +119,6 @@ class Borrow {
         return false;
     }
 
-    // ─────────────────────────────────────────────
-    // [7] Tìm kiếm phiếu mượn theo keyword
-    // ─────────────────────────────────────────────
     public function searchLoans($keyword) {
         $sql = "SELECT l.*, u.name as user_name, u.email, b.title as book_title, bi.barcode 
                 FROM Loans l
@@ -156,9 +138,6 @@ class Borrow {
         return $stmt->fetchAll();
     }
 
-    // ─────────────────────────────────────────────
-    // [8] Lấy phiếu mượn có phân trang + tìm kiếm
-    // ─────────────────────────────────────────────
     public function getLoansPaginated($limit, $offset, $keyword = '') {
         $sql = "SELECT l.*, u.name as user_name, u.email, b.title as book_title, bi.barcode 
                 FROM Loans l
@@ -188,9 +167,6 @@ class Borrow {
         return $stmt->fetchAll();
     }
 
-    // ─────────────────────────────────────────────
-    // [9] Đếm tổng số phiếu mượn (để phân trang)
-    // ─────────────────────────────────────────────
     public function countLoans($keyword = '') {
         $sql = "SELECT COUNT(*) as total 
                 FROM Loans l
@@ -215,10 +191,6 @@ class Borrow {
         return $row ? $row['total'] : 0;
     }
 
-    // ─────────────────────────────────────────────
-    // [10] Tìm bản copy sách available VÀ chưa có ai pending
-    //      Được gọi khi user thêm vào cart và khi checkout
-    // ─────────────────────────────────────────────
     public function findAvailableCopy($bookId) {
         $sql = "SELECT bi.book_items_id 
                 FROM Book_Items bi
@@ -232,10 +204,7 @@ class Borrow {
         return $stmt->fetch();
     }
 
-    // ─────────────────────────────────────────────
-    // [11] Tạo yêu cầu mượn mới -> status = 'pending'
-    //      Book_Items giữ nguyên 'available' cho đến khi admin approve
-    // ─────────────────────────────────────────────
+
     public function createLoanRequest($userId, $bookItemId, $dueDate) {
         $borrowDate = date('Y-m-d');
         
@@ -251,9 +220,6 @@ class Borrow {
         ]);
     }
 
-    // ─────────────────────────────────────────────
-    // [12] Lấy lịch sử mượn của một User
-    // ─────────────────────────────────────────────
     public function getUserLoans($userId) {
         $sql = "SELECT l.*, b.title, b.author, bi.barcode, b.url 
                 FROM Loans l
@@ -266,9 +232,6 @@ class Borrow {
         return $stmt->fetchAll();
     }
 
-    // ─────────────────────────────────────────────
-    // [13] Kiểm tra User đang mượn / pending sách này chưa
-    // ─────────────────────────────────────────────
     public function isUserBorrowingBook($userId, $bookId) {
         $sql = "SELECT COUNT(*) as total 
                 FROM Loans l
@@ -283,12 +246,7 @@ class Borrow {
         return ($row && $row['total'] > 0);
     }
 
-    // ─────────────────────────────────────────────
-    // [14] ✅ NEW: Validate ngày trả đúng range (server-side)
-    //      Trả về true nếu ngày hợp lệ (hôm nay <= date <= hôm nay + 21 ngày)
-    // ─────────────────────────────────────────────
     public static function isValidReturnDate($dateString) {
-        // Kiểm tra format
         $date = DateTime::createFromFormat('Y-m-d', $dateString);
         if (!$date || $date->format('Y-m-d') !== $dateString) {
             return false;
@@ -298,13 +256,10 @@ class Borrow {
         $maxDate = new DateTime('today');
         $maxDate->modify('+21 days');
 
-        // Ngày trả phải >= hôm nay VÀ <= hôm nay + 21 ngày
         return ($date >= $today && $date <= $maxDate);
     }
 
-    // ─────────────────────────────────────────────
-    // [15] Đếm tổng số sách mượn của một user
-    // ─────────────────────────────────────────────
+
     public function countLoansByUserId($userId) {
         $sql = "SELECT COUNT(*) as total FROM Loans WHERE user_id = :user_id";
         $stmt = $this->db->prepare($sql);
@@ -313,9 +268,6 @@ class Borrow {
         return $row ? (int)$row['total'] : 0;
     }
 
-    // ─────────────────────────────────────────────
-    // [16] Lấy lịch sử mượn của một User (phân trang)
-    // ─────────────────────────────────────────────
     public function getLoansByUserIdPaginated($userId, $limit, $offset) {
         $sql = "SELECT l.*, b.title, b.author, bi.barcode, b.url 
                 FROM Loans l
@@ -332,9 +284,8 @@ class Borrow {
         
         $stmt->execute();
         return $stmt->fetchAll();
-    }    // ─────────────────────────────────────────────
-    // [17] Gia hạn sách: Cập nhật ngày trả và đếm số lần
-    // ─────────────────────────────────────────────
+    }    
+
     public function updateRenewal($loanId, $newDueDate) {
         $sql = "UPDATE Loans 
                 SET due_date = :new_due_date, renewal_count = renewal_count + 1
@@ -347,11 +298,8 @@ class Borrow {
         return $result && $stmt->rowCount() > 0;
     }
 
-    // ─────────────────────────────────────────────
-    // [18] Kiểm tra sách có đang được ai khác đặt trước không
-    // ─────────────────────────────────────────────
+
     public function isBookReserved($bookId) {
-        // A book is considered "reserved" if there's at least one 'pending' loan request for it.
         $sql = "SELECT COUNT(l.loan_id) as total
                 FROM Loans l
                 JOIN Book_Items bi ON l.book_items_id = bi.book_items_id

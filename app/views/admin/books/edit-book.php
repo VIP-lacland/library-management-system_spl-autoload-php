@@ -1,5 +1,5 @@
 <?php
-// Đảm bảo config được load (thường đã được load từ admin.php)
+// Đảm bảo config được load (thường đã được load từ index.php)
 if (!defined('BASE_URL')) {
     require_once __DIR__ . '/../../../../app/config/config.php';
 }
@@ -44,7 +44,7 @@ if (!defined('BASE_URL')) {
                     </h2>
 
                     <!-- Form action trỏ về edit-book để controller xử lý cập nhật -->
-                    <form method="POST" action="admin.php?url=book/editBook&id=<?= $book_id ?>">
+                    <form method="POST" action="index.php?url=book/editBook&id=<?= $book_id ?>">
                         <!-- Title -->
                         <div class="form-group">
                             <label class="form-label">Title *</label>
@@ -107,7 +107,7 @@ if (!defined('BASE_URL')) {
 
                         <!-- Form Actions -->
                         <div class="form-actions">
-                            <a href="admin.php?url=book/adminBookList" class="btn btn-secondary">
+                            <a href="index.php?url=book/adminBookList" class="btn btn-secondary">
                                 <i class="fas fa-times"></i> Cancel
                             </a>
                             <button type="submit" class="btn btn-warning">

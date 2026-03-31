@@ -4,11 +4,11 @@ class AuthController extends Controller
     public function loginForm()
     {
         if (isset($_SESSION['user'])) {
-            if ($_SESSION['user']['role'] === 'admin') {
-                $this->redirect(url('?url=dashboard/index'));
-            } else {
-                $this->redirect(url('index.php?url=book/index'));
-            }
+            $url = $_SESSION['user']['role'] === 'admin'
+                ? url('index.php?url=dashboard/index')
+                : url('index.php?url=book/index');
+
+            $this->redirect($url);
             exit;
         }
 
@@ -34,7 +34,7 @@ class AuthController extends Controller
             $this->redirect(url('index.php?url=auth/login'));
             exit;
         }
-        
+
         if ($user['role'] == 'reader' && $user['status'] != 'active') {
             $this->setFlash('error', 'Your account is blocked');
             $this->redirect(url('index.php?url=auth/login'));
@@ -43,16 +43,15 @@ class AuthController extends Controller
 
         $_SESSION['user'] = [
             'id'        => $user['user_id'],
-            'name'      => $user['name'],          
+            'name'      => $user['name'],
             'full_name' => $user['full_name'] ?? '',
             'email'     => $user['email'],
-            'phone'     => $user['phone'] ?? '',  
-            'role'      => $user['role'] 
+            'phone'     => $user['phone'] ?? '',
+            'role'      => $user['role']
         ];
 
         if ($user['role'] === 'admin') {
-            // $this->redirect(url('admin.php?url=dashboard/index'));
-            $this->view('admin/dashboard');
+            $this->redirect(url('index.php?url=dashboard/index'));
         } else {
             $this->redirect(url('?url=book/index'));
         }
@@ -150,9 +149,8 @@ class AuthController extends Controller
                     $error = 'Something went wrong. Try again later.';
                 }
             }
-            
-            $this->view('auth/reset-password', ['error' => $error, 'email' => $email]);
 
+            $this->view('auth/reset-password', ['error' => $error, 'email' => $email]);
         } else {
             $this->view('auth/reset-password');
         }

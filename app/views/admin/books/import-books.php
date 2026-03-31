@@ -30,7 +30,7 @@
                         </h2>
                         <p class="text-muted mb-0">Upload a CSV file to add multiple books to the system at once</p>
                     </div>
-                    <a href="<?= url('admin.php?action=book-management') ?>" class="btn btn-secondary">
+                    <a href="<?= url('index.php?action=book-management') ?>" class="btn btn-secondary">
                         <i class="fas fa-arrow-left"></i> Go Back
                     </a>
                 </div>
@@ -50,7 +50,7 @@
 
                     <!-- Download Template Button -->
                     <div class="text-center mb-4">
-                        <a href="<?= url('admin.php?action=import-books-download-template') ?>" class="btn btn-outline-info">
+                        <a href="<?= url('index.php?action=import-books-download-template') ?>" class="btn btn-outline-info">
                             <i class="fas fa-download"></i> Download Sample CSV File
                         </a>
                     </div>
@@ -107,7 +107,7 @@
                             <button class="btn btn-primary me-2" onclick="location.reload()">
                                 <i class="fas fa-redo"></i>Import Another File”
                             </button>
-                            <a href="<?= url('admin.php?action=book-management') ?>" class="btn btn-success">
+                            <a href="<?= url('index.php?action=book-management') ?>" class="btn btn-success">
                                 <i class="fas fa-list"></i> View Book List
                             </a>
                         </div>
@@ -192,7 +192,7 @@
             resultBox.style.display = 'none';
 
             try {
-                const response = await fetch('<?= url('admin.php?action=import-books-process') ?>', {
+                const response = await fetch('<?= url('index.php?action=import-books-process') ?>', {
                     method: 'POST',
                     body: formData
                 });

@@ -3,25 +3,42 @@ session_start();
 
 // autoload register
 spl_autoload_register(function ($class_name) {
-    $file = __DIR__ . '/../app/controllers/' . $class_name . '.php';
-    if (file_exists($file)) require_once $file;
-
-    $file = __DIR__ . '/../app/models/' . $class_name . '.php';
-    if (file_exists($file)) require_once $file;
-
-     $file = __DIR__ . '/../app/core/' . $class_name . '.php';
-    if (file_exists($file)) require_once $file;
+    $dirs = [
+        __DIR__ . '/../app/controllers/',
+        __DIR__ . '/../app/controllers/admin/',
+        __DIR__ . '/../app/model/',
+        __DIR__ . '/../app/core/',
+    ];
+    foreach($dirs as $dir) {
+        $file = $dir . $class_name . '.php';
+        if (file_exists($file)) {
+            require_once $file;
+            return;
+        }
+    }
 });
 
 require_once '../app/config/config.php';
 
-$url = isset($_GET['url']) ? $_GET['url'] : 'book/index';
+$isAdmin = isset($_SESSION['user']) && $_SESSION['user']['role'] === 'admin';
+$defaultUrl = $isAdmin ? 'dashboard/index' : 'book/index';
+
+$url = isset($_GET['url']) ? $_GET['url'] : $defaultUrl;
 $segment = explode('/', $url);
 
-$controller_name = !empty($segment[0]) ? $segment[0] : 'book';
-$action = !empty($segment[1]) ? $segment[1] :  'index';
-$params = array_slice($segment,2);
-$controllerClass = ucfirst($controller_name) . 'Controller';
+$controller_name = $segment[0];
+$action = $segment[1];
+$params = array_slice($segment, 2);
+
+$publicControllers = ['auth', 'book', 'category'];
+
+if (!in_array($controller_name, $publicControllers) && !isset($_SESSION['user'])) {
+    header('Location: index.php?url=auth/loginForm');
+    exit;
+}
+
+$baseClass = ucfirst($controller_name) . 'Controller';
+$controllerClass = $isAdmin ? 'Admin' . $baseClass : $baseClass;
 
 try {
     $controller = new $controllerClass();
@@ -40,5 +57,3 @@ if (!method_exists($controller, $action)) {
 }
 
 call_user_func_array([$controller, $action], $params);
-
-

@@ -22,7 +22,7 @@
             <h2><i class="fas fa-history me-2"></i>Borrowing History</h2>
 
             <!-- Search Form -->
-            <form action="admin.php" method="GET" class="row g-2 mb-4">
+            <form action="index.php" method="GET" class="row g-2 mb-4">
                 <input type="hidden" name="url" value="borrowing/listBorrowing"> <!-- ✅ -->
                 <div class="col-md-8">
                     <input type="text" name="keyword" class="form-control"
@@ -34,16 +34,16 @@
                         <i class="fas fa-search"></i> Search
                     </button>
                     <?php if (!empty($keyword)): ?>
-                        <a href="admin.php?url=borrowing/listBorrowing" class="btn btn-secondary ms-1">Reset</a> <!-- ✅ -->
+                        <a href="index.php?url=borrowing/listBorrowing" class="btn btn-secondary ms-1">Reset</a> <!-- ✅ -->
                     <?php endif; ?>
                 </div>
             </form>
 
             <!-- Tab buttons -->
             <div class="mb-3">
-                <a href="admin.php?url=borrowing/listBorrowing" class="btn btn-primary active">All History</a>       <!-- ✅ -->
-                <a href="admin.php?url=borrowing/requests"      class="btn btn-outline-warning">Pending Requests</a> <!-- ✅ -->
-                <a href="admin.php?url=borrowing/overdue"       class="btn btn-outline-danger">Overdue Books</a>     <!-- ✅ -->
+                <a href="index.php?url=borrowing/listBorrowing" class="btn btn-primary active">All History</a>       <!-- ✅ -->
+                <a href="index.php?url=borrowing/requests"      class="btn btn-outline-warning">Pending Requests</a> <!-- ✅ -->
+                <a href="index.php?url=borrowing/overdue"       class="btn btn-outline-danger">Overdue Books</a>     <!-- ✅ -->
             </div>
 
             <?php if (!empty($success)): ?>
@@ -97,8 +97,7 @@
                                         </td>
                                         <td>
                                             <?php if (in_array($loan['status'], ['borrowing', 'overdue'])): ?>
-                                                <!-- ✅ sửa ?action= → ?url= -->
-                                                <a href="admin.php?url=borrowing/returnBook&id=<?= $loan['loan_id'] ?>"
+                                                <a href="index.php?url=borrowing/returnBook&id=<?= $loan['loan_id'] ?>"
                                                    class="btn btn-sm btn-success"
                                                    onclick="return confirm('Confirm return book?')">
                                                     <i class="fas fa-undo"></i> Return
@@ -123,15 +122,15 @@
             <nav class="mt-4">
                 <ul class="pagination justify-content-center">
                     <li class="page-item <?= $currentPage <= 1 ? 'disabled' : '' ?>">
-                        <a class="page-link" href="admin.php?url=borrowing/listBorrowing&page=<?= $currentPage - 1 . $kw ?>">Previous</a> <!-- ✅ -->
+                        <a class="page-link" href="index.php?url=borrowing/listBorrowing&page=<?= $currentPage - 1 . $kw ?>">Previous</a> <!-- ✅ -->
                     </li>
                     <?php for ($i = 1; $i <= $totalPages; $i++): ?>
                         <li class="page-item <?= $i == $currentPage ? 'active' : '' ?>">
-                            <a class="page-link" href="admin.php?url=borrowing/listBorrowing&page=<?= $i . $kw ?>"><?= $i ?></a> <!-- ✅ -->
+                            <a class="page-link" href="index.php?url=borrowing/listBorrowing&page=<?= $i . $kw ?>"><?= $i ?></a> <!-- ✅ -->
                         </li>
                     <?php endfor; ?>
                     <li class="page-item <?= $currentPage >= $totalPages ? 'disabled' : '' ?>">
-                        <a class="page-link" href="admin.php?url=borrowing/listBorrowing&page=<?= $currentPage + 1 . $kw ?>">Next</a> <!-- ✅ -->
+                        <a class="page-link" href="index.php?url=borrowing/listBorrowing&page=<?= $currentPage + 1 . $kw ?>">Next</a> <!-- ✅ -->
                     </li>
                 </ul>
             </nav>

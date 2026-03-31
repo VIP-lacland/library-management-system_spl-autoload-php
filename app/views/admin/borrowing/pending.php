@@ -23,9 +23,9 @@
                     <h2><i class="fas fa-clipboard-list me-2"></i>Borrow Requests</h2>
                 </div>
                 <div class="mb-3">
-                    <a href="admin.php?url=borrowing/listBorrowing" class="btn btn-outline-primary">All History</a>
-                    <a href="admin.php?url=borrowing/requests" class="btn btn-warning active text-dark">Pending Requests</a>
-                    <a href="admin.php?url=borrowing/overdue" class="btn btn-outline-danger">Overdue Books</a>
+                    <a href="index.php?url=borrowing/listBorrowing" class="btn btn-outline-primary">All History</a>
+                    <a href="index.php?url=borrowing/requests" class="btn btn-warning active text-dark">Pending Requests</a>
+                    <a href="index.php?url=borrowing/overdue" class="btn btn-outline-danger">Overdue Books</a>
                 </div>
                 <?php if (!empty($success)): ?>
                     <div class="alert alert-success"><?= htmlspecialchars($success) ?></div>
